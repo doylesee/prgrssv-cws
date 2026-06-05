@@ -16,7 +16,7 @@ This initiative was a massive "lift-and-shift" migration project, moving Progres
 The project introduced severe logistical and technical challenges:
 
 **Massive Content Scale**<br />
-The migration encompassed hundreds of high-traffic pages across widely distinct pages (Category pages, Team page, and Blogs). Every single page required complete layout accuracy, precise asset mapping, and meticulous manual migration of embedded SEO metadata, with the project to be completed on a very tight timeline.
+The migration encompassed hundreds of high-traffic pages across widely distinct pages (Category pages, Team pages, and Blogs). Every single page required complete layout accuracy, precise asset mapping, and meticulous manual migration of embedded SEO metadata, with the project to be completed on a very tight timeline.
 
 **SEO Retention & Redirects**<br />
 To preserve years of established search indexing, a massive map of URL redirects had to be tracked and configured perfectly to prevent broken links.
