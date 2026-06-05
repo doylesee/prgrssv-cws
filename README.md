@@ -4,7 +4,7 @@
 <pre>
 <b>Project:</b>   Progressive Insurance Careers Site
 <b>Role:</b>      Lead UI Developer & Technical Project Liaison
-<b>Tools:</b>     Liquid Markup, HTML5, CSS3, JavaScript / jQuery, Foundation, Google Lighthouse
+<b>Tools:</b>     Liquid, HTML5, CSS3, JavaScript / jQuery, Foundation, Google Lighthouse
 </pre>
 &nbsp;<strong><a href="https://careers.progressive.com/">View project</a></strong>
 
