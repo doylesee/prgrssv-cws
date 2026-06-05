@@ -13,7 +13,7 @@
 ## The Challenge
 This initiative was a massive "lift-and-shift" migration project, moving Progressive's complete enterprise recruitment portal from a third-party vendor over to our platform.
 
-The project introduced severe logistical and technical bottlenecks:
+The project introduced severe logistical and technical challenges:
 
 **Massive Content Scale**<br />
 The migration encompassed hundreds of high-traffic pages across widely distinct pages (Category pages, Team page, and Blogs). Every single page required complete layout accuracy, precise asset mapping, and meticulous manual migration of embedded SEO metadata, with the project to be completed on a very tight timeline.
