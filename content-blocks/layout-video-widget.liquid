@@ -1,0 +1,32 @@
+{% capture page_element_content_formatted %}{{ page_section_content | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+{% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attr' %}
+{% assign data_video_content = page_element_attr[1] | strip %}
+
+<div class="row">
+	<div class="column {{ cb_classes_column_wide }}">
+		{{ page_section_content | replace_first: '<p>','<p class="hide">' }}
+
+		<div class="video-widget  wrap" data-module="video-widget" id="videowidget" >
+		    <!--This data attribute determines video filtering, which is set by Altru Team-->
+		    <div class="{{ data_video_content }}" data-video-content="{{ data_video_content }}">
+		        <script src="https://widget.altrulabs.com/main.js" data-altru-widget-id="12011870"></script>
+		        <script>
+		            //start timer for altru round trip tracking
+		            const altruStartReq = Date.now();
+		        </script>
+		    </div> 
+		</div>
+	</div>
+</div>
+{% comment %}
+<script>
+    @model ProgressiveCom.Models.ProgressiveComModel 
+
+    @* BOTTOM CTA *@
+    @* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- *@
+    @Html.Partial("~/Views/wh3/modules/_video-widget.cshtml", Model, new ViewDataDictionary {
+            {"title", "{{ main_page_title }} Videos" },
+            { "videoCategory", "{{ data_video_content }}" }
+    })
+</script>
+{% endcomment %}

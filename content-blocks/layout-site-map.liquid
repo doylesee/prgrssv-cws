@@ -1,0 +1,30 @@
+<div class="page-section">
+    <div class="row">
+        <div class="column {{ cb_classes_column_narrow }}">
+            {% for employer_page in employer.pages %}
+                {% unless employer_page.tag_list contains 'child-to-' or employer_page.tag_list contains 'no-index' or employer_page.tag_list contains 'careers-home' %}
+                    <div class="site-map-item padded-v-large">
+                        {% capture employer_page_child_tag %}child-to-{{ employer_page.permalink }}{% endcapture %}
+                        {{ employer_page_child_tag | pages_with_tag | assign_to: 'employer_page_children' }}
+                        {% if employer_page_children.size > 0 %}
+                            <div class="row">
+                                <div class="columns large-6">
+                                    <h2 class="heading-3"><a href="{{ employer_page.url }}">{{ employer_page.title }}</a></h2>
+                                </div>
+                                <div class="columns large-6">
+                                    <ul>
+                                        {% for employer_page_child in employer_page_children %}
+                                            <li><a href="{{ employer_page_child.url }}/">{{ employer_page_child.title }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% else %}
+                            <h2 class="heading-3"><a href="{{ employer_page.url }}">{{ employer_page.title }}</a></h2>
+                        {% endif %}
+                    </div>
+                {% endunless %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

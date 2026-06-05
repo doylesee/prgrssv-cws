@@ -1,0 +1,20 @@
+<section id="banner-3" data-module="qs-types">    
+    <div class="page-banner padded-v-medium---">
+        <div class="row">
+            <div class="columns {{ cb_classes_column_narrow }} padded-v-medium--- text-center">
+                {% if page_section_object.images.size > 0 %}
+                    <img src="{{ page_section_object.images[0].url }}" alt="{% if page_section_object.images[0].title != page_section_object.images[0].file_name %}{{ page_section_object.images[0].title | html_safe }}{% endif %}" class="space-medium" style="max-height: 140px;" />
+                {% endif %}
+
+                {{ page_section_object.content | assign_to: 'page_section_object_content' }}
+                {% include '/_config__logic-page-hero' %}
+
+                {% unless cb_page_hero contains 'h1' or cb_non_hero contains 'h1' %}
+                <h1 id="main" tabindex="-1">{{ page_section_object.title | html_safe }}</h1>
+                {% endunless %}
+
+                {{ cb_page_hero }}
+            </div>
+        </div>
+    </div>
+</section>

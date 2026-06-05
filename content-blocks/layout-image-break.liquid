@@ -1,0 +1,9 @@
+<div class="image-break">
+	<div class="row space-large" data-module="image-break">
+		<div class="column {{ cb_classes_column_wide }}">
+			<div class="section-image space-large">
+				{{ page_section_content | remove: '<p>' | remove: '</p>' | replace: 'src=','loading="lazy" src=' }}
+			</div>
+		</div>
+	</div>
+</div>

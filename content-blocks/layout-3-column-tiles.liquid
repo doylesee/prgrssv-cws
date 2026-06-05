@@ -1,0 +1,55 @@
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | replace: '<pre>ITEM START</pre>','---<div class="item">' | replace: '<pre>ITEM END</pre>','</div>---' | replace: '<pre>ITEM END<SECTION','</div>---' }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% capture column_contents %}{% endcapture %}
+
+{{ 0 | assign_to: 'row_index' }}
+{% for page_element in page_elements %}
+	{% if page_element contains '<div class="item">' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+
+		{% if row_index == 0 %}
+			{{ row_index | plus: 1 | assign_to: 'row_index' }}
+			<div class="row">
+				<div class="column {{ cb_classes_column_wide }} space-large">
+					<div class="row same-height-parent-js" data-module="tiles">
+		{% endif %}
+
+		{% capture page_element_content_formatted %}{{ page_element | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+        {% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attr' %}
+        {% assign page_element_permalink = page_element_attr[1] | strip %}
+        {% assign page_element_image = page_element_attr[3] | strip %}
+
+		<div class="columns medium-6 large-4 end space-foundation column-tiles-item-outer">
+			<a data-tracking-label="{{ page_element_permalink | remove: '/pages/' }}" href="{{ page_element_permalink }}" class="column-tiles-item">
+				{{ page_element_image | replace: 'src=','class="full-width space-medium" src=' }}
+				<div class="same-height-item-js">{{ page_element | replace_first: '<p>','<p class="hide">' | replace_first: '<p><img','<p class="hide"><img' }}</div>
+			</a>
+		</div>
+		{% endcapture %}
+
+	{% elsif page_element != '' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+
+		{% if row_index == 1 %}
+			{{ row_index | minus: 1 | assign_to: 'row_index' }}
+					</div><!--close .row-->
+				</div><!--close .column-->
+			</div><!--close .row-->
+		{% endif %}
+
+		<div class="row">
+			<div class="column {{ cb_classes_column_narrow }}">
+				{{ page_element }}
+				<div class="space-medium show-for-large"></div>
+			</div>
+		</div>
+		{% endcapture %}
+	{% endif %}
+{% endfor %}
+
+<div class="page-section">
+	{{ column_contents | replace: 'src=','loading="lazy" src=' }}
+</div>

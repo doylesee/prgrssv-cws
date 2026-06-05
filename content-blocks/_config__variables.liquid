@@ -1,0 +1,171 @@
+{% comment %}Page Section Redirects{% endcomment %}
+{% if page.tag_list contains 'careers-home' or page.tag_list contains '-section-' or post.tag_list contains '-section' or page.tag_list contains 'header-message' %}
+    {% redirect_permanent root_url %}
+{% endif %}
+
+{% comment %}Detecting if DEV{% endcomment %}
+{% if root_url contains 'preview' or root_url contains 'cm-' or root_url contains '-dev' %}
+    {% capture cb_is_dev %}true{% endcapture %}
+
+    {% if root_url contains '-preview' %}{% comment %}Needed to add this logic because customer insisted on using a "preview" URL in PROD during the migration!{% endcomment %}
+        {% capture cb_is_dev %}false{% endcapture %}
+    {% endif %}
+{% endif %}
+
+{% comment %}Capturing site info{% endcomment %}
+{% capture current_page_url %}{{ root_url }}{{ request_fullpath }}{% endcapture %}
+{% if cb_is_dev == 'true' %}
+    {% if root_url contains '/progressivecareers-dev' or root_url contains 'e343ea' %}
+        {% capture cb_site_type %}external{% endcapture %}
+    {% elsif root_url contains '/progressivecareersinternal-dev' or root_url contains '5b9ecc' %}
+        {% capture cb_site_type %}internal{% endcapture %}
+    {% elsif root_url contains '/progressivecareerscollege-dev' or root_url contains '09e9eb' %}
+        {% capture cb_site_type %}college{% endcapture %}
+    {% elsif root_url contains '/progressivecareersloa-dev' or root_url contains '7bfc69' %}
+        {% capture cb_site_type %}loa{% endcapture %}
+    {% endif %}
+
+    {% capture cb_url_careers_external %}https://progressivecareers-dev.ttcportals.com{% endcapture %}
+    {% if root_url contains 'preview' %}{% capture cb_url_careers_external %}https://cm-preview-site-e343ea.ttcportals.com{% endcapture %}{% endif %}{% comment %}Doyle's workaround to their extremely slow analytics script{% endcomment %}
+    {% capture cb_url_careers_internal %}https://progressivecareersinternal-dev.ttcportals.com{% endcapture %}
+    {% capture cb_url_careers_college %}https://progressivecareerscollege-dev.ttcportals.com{% endcapture %}
+
+    {% capture cb_tn_url_external %}https://apply.talemetry.com/init-apply/ef4ca4ab-914d-4dff-886a-31120528f628/tn?parent_url={{ current_page_url | escape_url_param }}{% endcapture %}
+    {% capture cb_tn_url_college %}https://apply.talemetry.com/init-apply/ecf23350-7592-46ce-b974-db7a264ad42c/tn?parent_url={{ current_page_url | escape_url_param }}{% endcapture %}
+{% else %}
+    {% if root_url contains '/careers.progressive.com' or root_url contains '/progressivecareers-preview' %}
+        {% capture cb_site_type %}external{% endcapture %}
+    {% elsif root_url contains '/internalcareers.progressive.com' or root_url contains '/progressivecareersinternal-preview' %}
+        {% capture cb_site_type %}internal{% endcapture %}
+    {% elsif root_url contains '/earlycareers.progressive.com' or root_url contains '/progressivecareerscollege-preview' %}
+        {% capture cb_site_type %}college{% endcapture %}
+    {% elsif root_url contains '/careers-progressive.ttcportals.com' or root_url contains '/progressivecareersloa-preview' %}
+        {% capture cb_site_type %}loa{% endcapture %}
+    {% endif %}
+
+    {% if root_url contains '-preview' %}{% comment %}Needed to add this logic because customer insisted on using a "preview" URL in PROD during the migration!{% endcomment %}
+        {% capture cb_url_careers_external %}https://careers.progressive.com{% endcapture %}
+        {% capture cb_url_careers_internal %}https://internalcareers.progressive.com{% endcapture %}
+        {% capture cb_url_careers_college %}https://earlycareers.progressive.com{% endcapture %}
+    {% else %}
+        {% capture cb_url_careers_external %}https:///progressivecareers-preview.ttcportals.com{% endcapture %}
+        {% capture cb_url_careers_internal %}https://progressivecareersinternal-preview.ttcportals.com{% endcapture %}
+        {% capture cb_url_careers_college %}https://progressivecareerscollege-preview.ttcportals.com{% endcapture %}
+    {% endif %}
+
+    {% capture cb_tn_url_external %}https://apply.talemetry.com/init-apply/ef4ca4ab-914d-4dff-886a-31120528f628/tn?parent_url={{ current_page_url | escape_url_param }}{% endcapture %}
+    {% capture cb_tn_url_college %}https://apply.talemetry.com/init-apply/ecf23350-7592-46ce-b974-db7a264ad42c/tn?parent_url={{ current_page_url | escape_url_param }}{% endcapture %}
+{% endif %}
+
+{% comment %}set is_referral_site variable{% endcomment %}
+{% capture is_referral_site %}false{% endcapture %}
+
+{% comment %}Capturing TN URL{% endcomment %}
+{% if cb_site_type == 'external' %}
+    {% if template.permalink contains 'students-graduates' %}
+        {% capture cb_talent_network %}tn_college{% endcapture %}
+    {% else %}
+        {% capture cb_talent_network %}tn_external{% endcapture %}
+    {% endif %}
+{% elsif cb_site_type == 'college' %}
+    {% capture cb_talent_network %}tn_college{% endcapture %}
+{% endif %}
+
+{% comment %}Capturing Life at Progressive (BLog Post) permalink values{% endcomment %}
+{% capture cb_life_permalink %}life-at-progressive{% endcapture %}
+{% capture cb_life_page_permalink %}pages-life-at-progressive{% endcapture %}
+{% capture cb_life_child_tag %}child-to-{{ cb_life_permalink }}{% endcapture %}
+
+{% comment %}Capturing company name into a variable for use within code{% endcomment %}
+{% capture cb_company_name %}Progressive{% endcapture %}
+
+{% capture locale_permalink %}/{{ current_locale.locale }}{% endcapture %}
+
+{% comment %}Detecting if Careers Home page{% endcomment %}
+{% capture current_locale_locale_down %}{{ current_locale.locale | downcase }}{% endcapture %}
+{% if template.permalink == 'career_site_home_page' or template.permalink == current_locale_locale_down %}
+    {% capture cb_is_home_page %}true{% endcapture %}
+{% endif %}
+
+{% comment %}Detecting if Category CONTENT page{% endcomment %}
+{% if page.tag_list contains 'child-to-our-teams' %}
+    {% capture cb_is_category_content_page %}true{% endcapture %}
+
+    {% capture category_content_page_element_content_formatted %}{{ page.content | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+    {% assign category_content_page_element_content_array = category_content_page_element_content_formatted | split: '---' | assign_to: 'category_content_page_element_attr' %}
+    {% capture cb_category_content_page_element_permalink %}{{ category_content_page_element_attr[1] | strip }}{% endcapture %}
+{% endif %}
+
+{% comment %}Detecting if Category page{% endcomment %}
+{% capture current_locale_url %}{{ current_locale_locale_down }}-{% endcapture %}
+{% capture category_tag %}{{ template.permalink | remove: current_locale_url }}-content{% endcapture %}
+{{ category_tag | pages_with_tag | assign_to: 'category_pages' }}
+{% if category_pages.size > 0 %}
+    {% capture cb_is_category_page %}true{% endcapture %}
+{% endif %}
+
+{% comment %}Detecting if Job Search Results page{% endcomment %}
+{% if request.path contains '/search' and request.path contains '/jobs' and cb_is_category_page != 'true' %}
+    {% capture cb_is_job_search %}true{% endcapture %}
+{% endif %}
+
+{% comment %}set cb_is_job_details variable{% endcomment %}
+{% if template.permalink contains 'referral-' %}
+    {% capture cb_is_referral_page %}true{% endcapture %}
+{% endif %}
+{% if cb_site_type == 'internal' %}
+    {% if job and is_referral_page == 'true' %}
+        {% capture cb_is_job_details %}false{% endcapture %}
+    {% else %}
+        {% capture cb_is_job_details %}true{% endcapture %}
+    {% endif %}
+{% endif %}
+
+{% comment %}Logic to show Referral elements{% endcomment %}
+{% if
+    job.cfdisplay_PostingDestination == 'External'
+    or job.cfdisplay_PostingDestination == 'External/Internal'
+    or job.cfdisplay_PostingDestination == 'College/External/Internal'
+    or job.cfdisplay_PostingDestination == 'College/External'
+%}
+    {% capture cb_show_referral_elements %}true{% endcapture %}
+
+    {% if job.cfdisplay_SocialReferral == 'Allow Social Media Referral' %}
+        {% capture cb_show_referral_share %}true{% endcapture %}
+    {% endif %}        
+{% endif %}
+
+{% comment %}Logic to hide Apply button on Internal site{% endcomment %}
+{% if cb_site_type == 'internal' and job.cfdisplay_EvergreenRequisition == 'Yes' %}
+    {% capture hide_apply_button %}true{% endcapture %}
+{% endif %}
+
+{% comment %}Capturing column classes for consistency and re-use{% endcomment %}
+{% if post %}
+    {% capture cb_classes_column_narrow %}medium-8 medium-offset-2 end{% endcapture %}
+{% else %}
+    {% capture cb_classes_column_narrow %}medium-8 medium-offset-2 large-10 large-offset-1 end{% endcapture %}
+{% endif %}
+{% capture cb_classes_column_narrow_template %}medium-8 medium-offset-2 large-10 large-offset-1 end{% endcapture %}
+{% capture cb_classes_column_wide %}medium-8 medium-offset-2 large-12 large-offset-0 end{% endcapture %}
+
+{% comment %}Checking if page has banner{% endcomment %}
+{{ 'careers-home' | pages_with_tag | assign_to: 'careers_home' }}
+{% if cb_is_home_page == 'true' and careers_home[0].images.size == 1 %}
+    {% capture cb_page_has_banner %}true{% endcapture %}
+{% elsif page and page.images.size == 1 %}
+    {% capture cb_page_has_banner %}true{% endcapture %}
+{% elsif post and post.images.size > 0 %}
+    {% capture cb_page_has_banner %}true{% endcapture %}
+{% endif %}
+
+{% comment %}Checking if page has no banner image but has hero copy{% endcomment %}
+{% if cb_page_has_banner != 'true' %}
+    {% if cb_is_home_page == 'true' and careers_home[0].content contains 'HERO START' %}
+        {% capture cb_page_has_hero_copy %}true{% endcapture %}
+    {% elsif page and page.content contains 'HERO START' %}
+        {% capture cb_page_has_hero_copy %}true{% endcapture %}
+    {% elsif post and post.content contains 'HERO START' %}
+        {% capture cb_page_has_hero_copy %}true{% endcapture %}
+    {% endif %}
+{% endif %}

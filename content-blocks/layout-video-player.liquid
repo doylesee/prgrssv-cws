@@ -1,0 +1,142 @@
+{% capture video_image %}{% endcapture %}
+{% capture page_element_content_formatted %}{{ page_section_content | replace: '<p>','---<p>' | replace: '</p>','</p>---' }}{% endcapture %}
+{% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attrs' %}
+{% if page_element_attrs[1] contains '<p><img' %}
+	{% capture video_image %}{{ page_element_attrs[1] }}{% endcapture %}
+{% endif %}
+
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | remove: video_image | replace: '<pre>ITEM START</pre>','---<div class="item">' | replace: '<pre>ITEM END</pre>','</div>---' | replace: '<pre>INTRO START</pre>','---<div class="item intro">' | replace: '<pre>INTRO END</pre>','</div>---'  }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% capture column_contents %}{% endcapture %}
+{% capture content_intro %}{% endcapture %}
+{% capture content_pre %}{% endcapture %}
+{% capture content_post %}{% endcapture %}
+
+{{ 0 | assign_to: 'item_index' }}
+{% for page_element in page_elements %}
+	{% if page_element contains '<div class="item intro">' %}
+		{% capture content_intro %}
+			<div class="space-large">{{ page_element }}</div>
+		{% endcapture %}
+
+	{% elsif page_element contains '<div class="item">' %}
+		{% capture page_element_content_formatted %}{{ page_element | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+        {% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attr' %}
+
+        {% assign page_element_heading = page_element_attr[1] | strip %}
+        {% capture page_element_heading_id %}{{ page_element_heading | replace_global_regex: '[^\w\s]', '' | downcase | replace: ' ','-' }}{% endcapture %}
+        {% capture page_element_heading_wrapped %}<p>{{ page_element_heading }}</p>{% endcapture %}
+
+		{% capture column_contents %}
+		{{ column_contents }}
+		<div class="columns">
+			<div class="transcript-item padded-v-medium">
+				<div class="row">
+					<div class="columns medium-3">
+						<p class="heading-4">{{ page_element_heading }}</p>
+					</div>
+					<div class="columns medium-8 medium-offset-1 large-9 large-offset-0">
+						{{ page_element | remove_first: page_element_heading_wrapped }}
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endcapture %}
+
+		{{ item_index | plus: 1 | assign_to: 'item_index' }}
+
+	{% elsif page_element != '' %}
+		{% if item_index == 0 %}
+			{% capture content_pre %}
+			<div class="space-large">{{ page_element }}</div>
+			{% endcapture %}
+		{% else %}
+			{% capture content_post %}
+			<div class="space-large">{{ page_element }}</div>
+			{% endcapture %}
+		{% endif %}
+
+	{% endif %}
+{% endfor %}
+
+<div class="page-section">
+	{% if content_pre != blank %}
+	<div class="row">
+		<div class="column {{ cb_classes_column_narrow }}">
+			{{ content_pre }}
+		</div>
+	</div>
+	{% endif %}
+	<div class="row" data-module="video-player">
+		<div class="column {{ cb_classes_column_wide }} video-player-outer">
+			<div class="space-large">
+				{% if page %}
+					{{ page.videos[video_index].url | split: '/' | assign_to: 'video_url_parts' }}
+					{% capture video_id %}{{ video_url_parts | last }}{% endcapture %}
+				{% elsif post %}
+					{{ post.videos[video_index].url | split: '/' | assign_to: 'video_url_parts' }}
+					{% capture video_id %}{{ video_url_parts | last }}{% endcapture %}
+				{% endif %}
+				{% capture video_id_w_rel %}{{ video_id }}?rel=0{% endcapture %}
+
+				<div class="video-player-image">
+					{% if video_image != blank %}
+						{{ video_image | remove: '<p>' | remove: '</p>' | replace: 'src=','class="full-width" src=' }}
+					{% else %}
+						{% if page %}
+							<img src="https:{{ page.videos[video_index].thumbnail_url | replace: 'default','maxresdefault' }}" alt="{{ page.videos[video_index].title }}" class="full-width" loading="lazy" />
+						{% elsif post %}
+							<img src="https:{{ post.videos[video_index].thumbnail_url | replace: 'default','maxresdefault' }}" alt="{{ post.videos[video_index].title }}" class="full-width" loading="lazy" />
+						{% endif %}
+					{% endif %}
+					<button class="video-player-image__button js"><i class="fa-solid fa-play" style="color: #4ebee5;"></i> &nbsp;&nbsp; PLAY VIDEO<span class="show-for-sr"> {% if page %}{{ page.videos[video_index].title }}{% elsif post %}{{ post.videos[video_index].title }}{% endif %}</span></button>
+				</div><!--close .video-player-image-->
+				<div class="video-player-video relative-container">
+					<div class="responsive-embed responsive-embed--{{ video_index }}">						
+						{% if page %}
+							{{ page.videos[video_index].code | replace: 'http://','https://' | replace: video_id,video_id_w_rel }}
+						{% elsif post %}
+							{{ post.videos[video_index].code | replace: 'http://','https://' | replace: video_id,video_id_w_rel }}
+						{% endif %}
+
+						{% if page %}
+							{{ page.videos[video_index].url | split: '/' | assign_to: 'video_url_parts' }}
+							{% capture video_id %}{{ video_url_parts | last }}{% endcapture %}
+						{% elsif post %}
+							{{ post.videos[video_index].url | split: '/' | assign_to: 'video_url_parts' }}
+							{% capture video_id %}{{ video_url_parts | last }}{% endcapture %}
+						{% endif %}
+					</div>
+				</div><!--close .video-player-video-->
+			</div>
+		</div>
+
+		<div class="column video-transcript-outer">
+			<div class="row">
+				<div class="column {{ cb_classes_column_narrow }} text-center">
+					<button class="video-transcript-button js space-large" aria-expanded="false" aria-controls="video-transcript-content-1" data-tracking-override data-tracking-pageposition="video-player_{{ video_id }}"><strong><span class="video-transcript-show-hide">Show</span><span class="video-transcript-show-hide hide">Hide</span> video transcript</strong></button>
+					<div class="video-transcript-content js hide text-left" id="video-transcript-content-1" role="region">
+						{% if content_intro != blank %}
+						<div class="row">
+							<div class="column text-left">
+								{{ content_intro | replace: 'src=','loading="lazy" src=' }}
+							</div>
+						</div>
+						{% endif %}
+						<div class="row text-left">
+							{{ column_contents | replace: 'src=','loading="lazy" src=' }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% if content_post != blank %}
+		<div class="row">
+			<div class="column {{ cb_classes_column_narrow }}">
+				{{ content_post | replace: 'src=','loading="lazy" src=' }}
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>

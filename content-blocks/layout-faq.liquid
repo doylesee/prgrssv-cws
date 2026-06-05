@@ -1,0 +1,54 @@
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | replace: '<pre>ITEM START</pre>','---<div class="item">' | replace: '<pre>ITEM END</pre>','</div>---' }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% capture column_contents %}{% endcapture %}
+
+{{ 0 | assign_to: 'item_index' }}
+{% for page_element in page_elements %}
+	{% if page_element contains '<div class="item">' %}
+
+		{% capture page_element_content_formatted %}{{ page_element | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+        {% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attr' %}
+        {% assign page_element_question = page_element_attr[1] | strip %}
+        {% capture page_element_question_wrapped %}<p>{{ page_element_question }}</p>{% endcapture %}
+
+		{% capture column_contents %}
+		{{ column_contents }}
+		<div class="columns">
+			<div class="faq-item padded-v-large padded-h-small" data-module="swiss-type">
+				<div class="row">
+					<div class="columns large-5">
+						<h3>{{ page_element_question }}</h3>
+					</div>
+					<div class="columns large-6 large-offset-1">
+						{{ page_element | remove_first: page_element_question_wrapped }}
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endcapture %}
+
+		{{ item_index | plus: 1 | assign_to: 'item_index' }}
+
+	{% elsif page_element != '' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+		<div class="column space-medium">
+			{% if column_contents != blank %}
+				<div class="padded-v-large"></div>
+			{% endif %}
+			{{ page_element }}
+		</div>
+		{% endcapture %}
+	{% endif %}
+{% endfor %}
+
+<div class="page-section">
+	<div class="row">
+		<div class="column {{ cb_classes_column_narrow }}">
+			<div class="row">
+				{{ column_contents | replace: 'src=','loading="lazy" src=' }}
+			</div>
+		</div>
+	</div>
+</div>

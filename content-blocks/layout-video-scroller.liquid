@@ -1,0 +1,126 @@
+{% capture page_element_content_formatted %}{{ page_section_content | replace: '<p>','---<p>' | replace: '</p>','</p>---' }}{% endcapture %}
+{% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attrs' %}
+
+{% for page_element_attr in page_element_attrs %}
+	{% if page_element_attr != blank %}
+		{% if forloop.index == 2 %}
+			{% capture page_content_left %}{{ page_element_attr }}{% endcapture %}
+		{% else %}
+			{% capture page_content_right %}
+			{{ page_content_right }}
+			{{ page_element_attr }}
+			{% endcapture %}
+		{% endif %}
+	{% endif %}
+{% endfor %}
+
+<div class="scroller-inner scroller-inner--{{ scroller_index }} js" data-module="scroller">
+	<div class="scroller-left__button-outer">
+		<div class="row">
+			<div class="column">
+				<button class="scroller-left__button active js show-for-medium">
+					<span class="scroller-left__button--pause"><i class="fa-solid fa-pause"></i>&nbsp; Pause Video</span>
+					<span class="scroller-left__button--play"><i class="fa-solid fa-play"></i>&nbsp; Play Video</span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="scroller-left js">
+		<div class="row">
+			<div class="columns">
+				<div class="relative-container">
+					<div class="scroller-left__video">
+						{{ page_content_left }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="columns small-10 small-offset-1 medium-8 medium-offset-2 large-6 large-offset-5 end">
+			<div class="scroller-right-outer">
+				<div class="scroller-right js">
+					{{ page_content_right | replace: 'src=','loading="lazy" src=' }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="scroller-inner-clone js"></div>
+</div>
+
+{% comment %}
+<style>
+.body-inner { position: relative; }
+.marker-1,
+.marker-2,
+.marker-3 {
+	height: 1px;
+	left: 0;
+	position: absolute;
+	width: 100%;
+	z-index: 99999;
+}
+.marker-1 { background: #ff0000; }
+.marker-2 { background: #00ff00; }
+.marker-3 { background: #0000ff; }
+</style>
+{% endcomment %}
+
+<script>
+$(document).ready(function() {
+	var media_top = 0;
+	var media_left_height = 0;
+	var media_end = 0;
+	var media_bottom = 0;
+
+	$(window).resize(function() {
+		$('.scroller-inner--{{ scroller_index }}').removeClass('desktop fixed absolute');
+		$('.scroller-inner--{{ scroller_index }} .scroller-right-outer').attr('style','padding-top: 0;');
+		$('.scroller-left__button-outer').removeClass('fixed');
+
+		if ($('.width-detector').width() >= 1024) {
+			$('.scroller-inner--{{ scroller_index }}').addClass('desktop');
+			// On resize, capture media left top + media right bottom position values
+			setTimeout(function() {
+				media_top = $('.scroller-inner--{{ scroller_index }}').offset().top - 50;
+				media_left_height = 50 + $('.scroller-inner--{{ scroller_index }} .scroller-left.js').outerHeight() + 50;
+				media_end = ($('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').offset().top + $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').outerHeight()) - (70 + media_left_height);
+				media_bottom = $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').offset().top + $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').outerHeight() - 70;
+
+				/*
+				$('.marker-1').attr('style','top: '+media_top+'px;');
+				$('.marker-2').attr('style','top: '+media_end+'px;');
+				$('.marker-3').attr('style','top: '+media_bottom+'px;');
+				*/
+			}, 500);
+		}
+
+		// Disable video on mobile devices
+		if ($('.width-detector').width() < '640') {
+            $('.scroller-left__video video')[0].pause();
+            $('.scroller-left__video video')[0].currentTime = 0;
+        }
+        else {
+            $('.scroller-left__video video')[0].play();
+        }
+	}).resize();
+
+	$(window).scroll(function() {
+		if ( ($(window).scrollTop() > media_top) && ($(window).scrollTop() < media_end) ) {
+			$('.scroller-inner--{{ scroller_index }}.desktop').removeClass('absolute').addClass('fixed');
+			$('.scroller-inner--{{ scroller_index }}.desktop .scroller-right-outer').attr('style','padding-top: '+(media_left_height-100)+'px;');
+			$('.scroller-left__button-outer').addClass('fixed');
+		}
+		else if ( ($(window).scrollTop() > media_end) && ($(window).scrollTop() < media_bottom) ) {
+			$('.scroller-inner--{{ scroller_index }}.desktop').removeClass('fixed').addClass('absolute');
+			$('.scroller-inner--{{ scroller_index }}.desktop .scroller-right-outer').attr('style','padding-top: '+(media_left_height-100)+'px;');
+			$('.scroller-left__button-outer').removeClass('fixed');
+		}
+		else if ( ($(window).scrollTop() < media_top) || ($(window).scrollTop() > media_bottom) ) {
+			$('.scroller-inner--{{ scroller_index }}.desktop').removeClass('fixed absolute');
+			$('.scroller-inner--{{ scroller_index }}.desktop .scroller-right-outer').attr('style','padding-top: 0;');
+			$('.scroller-left__button-outer').removeClass('fixed');
+		}
+	});
+});
+</script>

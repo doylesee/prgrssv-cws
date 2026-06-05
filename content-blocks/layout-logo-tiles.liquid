@@ -1,0 +1,67 @@
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | replace: '<pre>ITEM START</pre>','---<div class="item">' | replace: '<pre>ITEM END</pre>','</div>---' }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% capture column_contents %}{% endcapture %}
+
+{{ 0 | assign_to: 'item_index' }}
+{{ 0 | assign_to: 'row_index' }}
+{% for page_element in page_elements %}
+	{% if page_element contains '<div class="item">' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+
+		{% if row_index == 0 %}
+			{{ row_index | plus: 1 | assign_to: 'row_index' }}
+			<div class="row">
+				<div class="column {{ cb_classes_column_wide }} space-large">
+					<div class="row same-height-parent-js" data-module="choices">
+		{% endif %}
+
+		{% capture page_element_content_formatted %}{{ page_element | replace: '<p>','---' | replace: '</p>','---' }}{% endcapture %}
+        {% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attr' %}
+        {% assign page_element_image = page_element_attr[1] | strip %}
+
+		<div class="columns large-4 end logo-tiles-item-outer">
+			<div class="logo-tiles-item">
+				<div class="row">
+					{% if page_element_image contains '<img' %}
+					<div class="columns small-3">
+						{{ page_element_image | remove: '<p>' | remove: '</p>' }}
+					</div>
+					{% endif %}
+					<div class="columns{% if page_element_image contains '<img' %} small-9{% endif %}">
+						<div class="same-height-item-js">
+							{{ page_element | remove: page_element_image | replace_first: '<p>','<p class="space-none">' }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endcapture %}
+
+		{{ item_index | plus: 1 | assign_to: 'item_index' }}
+
+	{% elsif page_element != '' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+
+		{% if row_index == 1 %}
+			{{ row_index | minus: 1 | assign_to: 'row_index' }}
+					</div><!--close .row-->
+				</div><!--close .column-->
+			</div><!--close .row-->
+		{% endif %}
+
+		<div class="row">
+			<div class="column {{ cb_classes_column_narrow }}">
+				{{ page_element }}
+				<div class="space-medium show-for-large"></div>
+			</div>
+		</div>
+		{% endcapture %}
+	{% endif %}
+{% endfor %}
+
+<div class="page-section">
+	{{ column_contents | replace: 'src=','loading="lazy" src=' }}
+</div>

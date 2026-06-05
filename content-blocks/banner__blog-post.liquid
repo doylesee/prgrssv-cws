@@ -1,0 +1,47 @@
+{{ page_section_object.content | assign_to: 'page_section_object_content' }}
+{% include '/_config__logic-page-hero' %}
+
+{{ post | assign_to: 'post_object' }}
+{% include '/_config__logic-article-publish-data' %}
+
+<section id="banner-4" data-module="billboard">
+    <div class="page-banner padded-v-medium">
+        <div class="row row--bigger">
+            <div class="column">
+                <div class="page-banner-inner space-large">
+                    <div class="row row--bigger" data-module="long-form-info">
+                        <div class="columns{% if page_section_object.images.size > 0 %} large-8 end{% endif %}">
+                            <div class="page-banner__copy">
+                                <div class="space-xlarge---">
+                                   {{ cb_post_category_link }}
+
+                                    {% unless cb_page_hero contains 'h1' or cb_non_hero contains 'h1' %}
+                                    <h1 id="main" tabindex="-1">{{ page_section_object.title | html_safe }}</h1>
+                                    {% endunless %}
+                                    
+                                    {{ cb_page_hero | replace: '<pre>','<pre class="hide">' }}{% comment %}the <pre> replace logic has been added to solve for the Author name - see _config__logic-page-hero{% endcomment %}
+                                    <div class="padded-v-small"></div>
+                                </div>
+
+                                <div class="padded-v-xlarge space-medium show-for-large"></div>
+
+                                {{ cb_article_publish_data }}
+                            </div>
+                        </div>
+                        <div class="columns large-4 large-offset-8 page-banner__image-outer">
+                            {% if page_section_object.images.size > 0 %}
+                                <div class="page-banner__image image-container">
+                                    {% if page_section_object.images.size == 1 %}
+                                       <img src="{{ page_section_object.images[0].url }}" alt="{% if page_section_object.images[0].title != page_section_object.images[0].file_name %}{{ page_section_object.images[0].title | html_safe }}{% endif %}" class="full-width" />
+                                    {% elsif page_section_object.images.size > 1 %}
+                                        <img src="{{ page_section_object.images[1].url }}" alt="{% if page_section_object.images[1].title != page_section_object.images[1].file_name %}{{ page_section_object.images[1].title | html_safe }}{% endif %}" class="full-width" />
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div><!--close .page-banner-inner-->
+            </div>
+        </div>
+    </div><!--close .page-banner-->
+</section>

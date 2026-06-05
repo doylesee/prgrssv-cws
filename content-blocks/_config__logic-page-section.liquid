@@ -1,0 +1,120 @@
+{% capture custom_layout_collection %}3-COLUMN TILES,4-COLUMN TILES,FAQ,IMAGE BREAK,IMAGE GRID,JUMP LINKS,LOGO TILES,MINI CARDS,PRO-TIP,QUOTE BLUE,QUOTE GREEN,STEPS,TEAM TILES,TEXT SCROLLER,VIDEO PLAYER,VIDEO SCROLLER,VIDEO WIDGET{% endcapture %}
+{% capture background_collection %}background-1,background-2,background-3{% endcapture %}
+
+{% capture page_section_content %}{% endcapture %}
+
+{{ 0 | assign_to: 'scroller_index' }}
+{{ 0 | assign_to: 'video_index' }}
+
+{% capture page_section_content_formatted %}{{ cb_non_hero }}{% endcapture %}
+{% capture page_section_content_formatted %}{{ cb_non_hero | replace_global_regex: '\n|\r','' | replace: 'ENDSECTION','END</pre><pre>SECTION' }}{% endcapture %}{% comment %}workaround since product adds extra unnecessary space after the opening <pre> tag{% endcomment %}
+
+
+{{ custom_layout_collection | split: ',' | assign_to: 'custom_layouts' }}
+{% for custom_layout in custom_layouts %}
+    {% capture custom_layout_start_with_pre %}<pre>SECTION {{ custom_layout }} START{% endcapture %}
+    {% capture custom_layout_start_with_pre_dash %}---<pre>SECTION {{ custom_layout }} START{% endcapture %}
+    {% capture custom_layout_end_with_pre %}<pre>SECTION {{ custom_layout }} END</pre>{% endcapture %}
+    {% capture custom_layout_end_with_pre_dash %}<pre>SECTION {{ custom_layout }} END</pre>---{% endcapture %}
+
+    {% capture page_section_content_formatted %}{{ page_section_content_formatted | replace: custom_layout_start_with_pre,custom_layout_start_with_pre_dash | replace: custom_layout_end_with_pre,custom_layout_end_with_pre_dash }}{% endcapture %}
+{% endfor %}
+{% assign page_section_content_array = page_section_content_formatted | split: '---' | assign_to: 'page_sections' %}
+
+{% for page_section in page_sections %}
+    {% capture has_scroller %}false{% endcapture %}
+    {% capture has_video %}false{% endcapture %}
+
+    {% if page_section != blank %}
+        {% capture page_section_trunc %}{{ page_section | truncatewords: 10 }}{% endcapture %}{% comment %}for easy debugging{% endcomment %}
+        {% capture page_section_background %}{% endcapture %}
+        {% capture custom_layout_content_block_name %}{% endcapture %}
+        {% capture custom_layout_start %}{% endcapture %}
+        {% capture custom_layout_start_w_bg %}{% endcapture %}
+        {% capture custom_layout_end %}{% endcapture %}
+
+        {{ custom_layout_collection | split: ',' | assign_to: 'custom_layouts' }}
+
+        {% for custom_layout in custom_layouts %}
+            {% comment %}checking if page section has a custom layout + capturing page section content without the PRE tags{% endcomment %}
+            {% capture custom_layout_start %}SECTION {{ custom_layout }} START{% endcapture %}
+            {% capture custom_layout_end %}SECTION {{ custom_layout }} END{% endcapture %}
+            {% capture custom_layout_start_pre %}<pre>{{ custom_layout_start }}</pre>{% endcapture %}
+            {% capture custom_layout_end_pre %}<pre>{{ custom_layout_end }}</pre>{% endcapture %}
+
+            {% if page_section contains custom_layout_start %}
+                {% capture custom_layout_content_block_name %}/layout-{{ custom_layout | remove: ' START' | downcase | replace: ' ','-' }}{% endcapture %}
+
+                {% if custom_layout contains 'SCROLLER' %}
+                    {% capture has_scroller %}true{% endcapture %}
+                {% elsif custom_layout contains 'VIDEO PLAYER' %}
+                    {% capture has_video %}true{% endcapture %}
+                {% endif %}
+
+                {% if page_section contains 'background-' %}
+                    {{ background_collection | split: ',' | assign_to: 'backgrounds' }}
+                    {% for background in backgrounds %}
+                        {% if page_section contains background %}
+                            {% capture custom_layout_start_pre_w_bg_test %}<pre>{{ custom_layout_start }} {{ background }}</pre>{% endcapture %}
+
+                            {% if page_section contains custom_layout_start_pre_w_bg_test %}
+                                {% capture custom_layout_start_pre_w_bg %}<pre>{{ custom_layout_start }} {{ background }}</pre>{% endcapture %}
+                                {% capture page_section_background %}{{ background }}{% endcapture %}
+
+                                {% break %}
+                            {% else %}
+                                {% capture custom_layout_start_pre_w_bg %}{% endcapture %}
+                                {% capture page_section_background %}{% endcapture %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% capture page_section_content %}{{ page_section | remove: custom_layout_start_pre | remove: custom_layout_start_pre_w_bg | remove: custom_layout_end_pre }}{% endcapture %}
+
+                {% break %}
+
+            {% endif %}
+        {% endfor %}
+
+        {% comment %}outputting the page section content{% endcomment %}
+        <section class="page-section{% if page_section_background != blank %} {{ page_section_background }}{% endif %}">
+            {% if post and forloop.index == 1 %}
+                <div class="space-standard"></div>
+            {% else %}
+                <div class="space-standard{% if post %}--blog-post{% endif %}"></div>
+            {% endif %}
+
+            {% if custom_layout_content_block_name != blank %}
+                {% comment %}content block include for the layout{% endcomment %}
+                {% include custom_layout_content_block_name %}
+
+            {% elsif page_section != blank %}
+                {% comment %}just regular page section content{% endcomment %}
+                <div class="row space-medium"{% if page_section contains '<img' %} data-module="content-image"{% endif %}>
+                    <div class="column {{ cb_classes_column_narrow }}">
+                        {% if post and forloop.index == 1 %}
+                            {{ page_section | strip_html | split: ' ' | assign_to: 'post_words' }}
+                            {% capture first_letter %}{{ post_words[0] | slice: 0 }}{% endcapture %}
+                            {% capture first_letter_formatted %}<span class="post-first-letter" data-letter="{{ first_letter }}">{{ first_letter }}</span>{% endcapture %}
+
+                            {{ page_section | replace: 'src=','loading="lazy" src=' | replace_first: first_letter,first_letter_formatted }}
+
+                        {% else %}
+                            {{ page_section | replace: 'src=','loading="lazy" src=' }}
+
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endif %}
+        </section>
+
+        {% if has_video == 'true' %}
+            {{ video_index | plus: 1 | assign_to: 'video_index' }}
+        {% endif %}
+
+        {% if has_scroller == 'true' %}
+            {{ scroller_index | plus: 1 | assign_to: 'scroller_index' }}
+        {% endif %}
+    {% endif %}
+{% endfor %}

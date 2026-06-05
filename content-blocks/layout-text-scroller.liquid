@@ -1,0 +1,89 @@
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | replace: '<pre>ITEM END</pre><pre>ITEM START</pre>','</div>---<div class="item">' | replace: '<pre>ITEM START</pre>','<div class="item">' | replace: '<pre>ITEM END</pre>','</div>' }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% assign page_content_left = page_elements[0] %}
+{% assign page_content_right = page_elements[1] %}
+
+<div class="scroller-inner scroller-inner--{{ scroller_index }} scroller-inner--text js" data-module="scroller">
+	<div class="scroller-left js">
+		<div class="row padded-v-large">
+			<div class="columns small-10 small-offset-1 medium-8 medium-offset-2 large-5 large-offset-0 end space-large">
+				{{ page_content_left | replace: 'src=','loading="lazy" src=' }}
+
+				<div class="scroller-left-bg"></div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="columns small-10 small-offset-1 medium-8 medium-offset-2 large-6 large-offset-5 end">
+			<div class="scroller-right-outer">
+				<div class="scroller-right js">
+					{{ page_content_right | replace: 'src=','loading="lazy" src=' }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="scroller-inner-clone js"></div>
+</div>
+<div class="padded-v-xlarge"></div>
+
+{% comment %}
+<style>
+.body-inner { position: relative; }
+.marker-1,
+.marker-2 {
+	height: 1px;
+	left: 0;
+	position: absolute;
+	width: 100%;
+	z-index: 99999;
+}
+.marker-1 { background: #ff0000; }
+.marker-2 { background: #00ff00; }
+</style>
+{% endcomment %}
+
+<script>
+$(document).ready(function() {
+	var media_top = 0;
+	var media_left_height = 0;
+	var media_end = 0;
+	var media_bottom = 0;
+
+	$(window).resize(function() {
+		$('.scroller-inner--{{ scroller_index }}').removeClass('desktop fixed absolute');
+		$('.scroller-inner--{{ scroller_index }} .scroller-right-outer').attr('style','padding-top: 0;');
+
+		if ($('.width-detector').width() >= 1024) {
+			$('.scroller-inner--{{ scroller_index }}').addClass('desktop');
+			// On resize, capture media left top + media right bottom position values
+			setTimeout(function() {
+				media_top = $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').offset().top - 50;
+				media_left_height = 50 + $('.scroller-inner--{{ scroller_index }} .scroller-left.js').outerHeight() + 50;
+				media_end = ($('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').offset().top + $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').outerHeight()) - (70 + media_left_height) + 170;
+				media_bottom = $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').offset().top + $('.scroller-inner--{{ scroller_index }} .scroller-inner-clone.js').outerHeight();
+
+				/*
+				$('.marker-1').attr('style','top: '+media_top+'px;');
+				$('.marker-2').attr('style','top: '+media_end+'px;');
+				*/
+			}, 500);
+		}
+	}).resize();
+
+	$(window).scroll(function() {
+		if ($(window).scrollTop() > media_top && $(window).scrollTop() < media_end) {
+			$('.scroller-inner--{{ scroller_index }}').removeClass('absolute').addClass('fixed');
+			//$('.scroller-inner--{{ scroller_index }} .scroller-right-outer').attr('style','padding-top: 50px;');
+		}
+		else if ($(window).scrollTop() > media_end && $(window).scrollTop() < media_bottom ) {
+			$('.scroller-inner--{{ scroller_index }}').removeClass('fixed').addClass('absolute');
+			//$('.scroller-inner--{{ scroller_index }} .scroller-right-outer').attr('style','padding-top: 50px;');
+		}
+		else {
+			$('.scroller-inner--{{ scroller_index }}').removeClass('fixed absolute');
+			$('.scroller-inner--{{ scroller_index }} .scroller-right-outer').attr('style','padding-top: 0;');
+		}
+	});
+});
+</script>

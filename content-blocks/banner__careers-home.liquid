@@ -1,0 +1,32 @@
+<section id="banner-1" data-module="split-mma">
+    <div class="page-banner padded-v-medium">
+        <div class="row padded-v-small space-small">
+            <div class="columns {{ cb_classes_column_wide }}">
+                <div class="row">
+                    <div class="columns large-6 large-push-6 text-center">
+                        {% if page_section_object.images.size > 0 %}
+                            <div class="page-banner__image-outer relative-container layer-1">
+                                <div class="page-banner__image relative-container layer-1">
+                                    <img src="{{ page_section_object.images[0].url }}" alt="{% if page_section_object.images[0].title != page_section_object.images[0].file_name %}{{ page_section_object.images[0].title | html_safe }}{% endif %}" />
+                                </div>
+                                <img src="/system/production/assets/420507/original/careers-home__banner--02.png" alt="" loading="lazy" />
+                            </div>
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                    </div>
+                    <div class="columns small-10 small-offset-1 end large-5 large-offset-1 large-pull-6 padded-v-large">
+                        {{ page_section_object.content | assign_to: 'page_section_object_content' }}
+                        {% include '/_config__logic-page-hero' %}
+
+                        {% unless cb_page_hero contains 'h1' or cb_non_hero contains 'h1' %}
+                        <h1 id="main" tabindex="-1">{{ page_section_object.title | html_safe }}</h1>
+                        {% endunless %}
+
+                        {{ cb_page_hero }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

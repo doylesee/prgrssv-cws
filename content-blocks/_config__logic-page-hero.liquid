@@ -1,0 +1,81 @@
+{% capture cb_hero_body %}{% endcapture %}
+{% capture cb_hero_heading %}{% endcapture %}
+{% capture cb_hero_author %}{% endcapture %}
+{% capture cb_page_hero %}{% endcapture %}
+{% capture cb_non_hero %}{% endcapture %}
+
+{% if page_section_object_content contains 'HERO START' %}
+    {% capture page_section_object_content_regexd %}{{ page_section_object_content | replace_global_regex: '\n|\r','' }}{% endcapture %}{% comment %}workaround since Talemetry WYSIWYG adds extra unnecessary space after the opening <pre> tag{% endcomment %}
+    {% capture banner_content_formatted %}{{ page_section_object_content_regexd | replace: 'ENDSECTION','END</pre><pre>SECTION' | replace: '<pre>HERO START</pre>','---<pre>HERO START</pre>' | replace: '<pre>HERO END</pre>','<pre>HERO END</pre>---' }}{% endcapture %}
+    {% assign banner_content_array = banner_content_formatted | split: '---' | assign_to: 'banner_element_attrs' %}
+
+    {% for banner_element_attr in banner_element_attrs %}
+        {% if banner_element_attr contains '<pre>HERO START</pre>' %}
+            {% capture page_hero %}{{ banner_element_attr | remove: '<pre>HERO START</pre>' | remove: '<pre>HERO END</pre>' }}{% endcapture %}
+
+        {% elsif banner_element_attr != '' %}
+            {% capture cb_non_hero %}
+            {{ cb_non_hero }}
+            {{ banner_element_attr }}
+            {% endcapture %}
+
+        {% endif %}
+    {% endfor %}
+
+    {% capture hero_content_formatted %}{{ page_hero | replace: '<h1>','---<h1>' | replace: '</h1>','</h1>---' | replace: '<pre>','---<pre>' | replace: '</pre>','</pre>---' }}{% endcapture %}
+    {% assign hero_content_array = hero_content_formatted | split: '---' | assign_to: 'hero_attrs' %}
+
+    {% comment %}
+    Sample Hero Attrs format:
+    <pre>HERO START</pre>
+    <h1>Ask a Recruiter: How to be confident in an interview</h1>
+    <h2>Nervous about an upcoming job interview? Hear a Progressive recruiter&rsquo;s top 10 tips for being confident in an interview</h2>
+    <pre>by: Author First Name Author Last Name, Author Title</pre>
+    <pre>published: YYYY-MM-DD</pre>
+    <pre>modified: YYYY-MM-DD</pre>
+    <pre>HERO END</pre>
+    {% endcomment %}
+
+    {% for hero_attr in hero_attrs %}
+        {% if hero_attr contains 'h1' %}
+            {% capture cb_hero_heading %}{{ hero_attr }}{% endcapture %}
+
+        {% elsif hero_attr contains '<pre>by:' %}
+            {% comment %}
+            Since Talemetry CWS Developers won't have access to PRG's employee logins,
+            this option has been implemented so the correct employee author name shows up
+            Author name has to be added inside the HERO section, with the following format: '<pre>by: Author Name, Author Role/Position</pre>'
+            {% endcomment %}
+            {% capture cb_hero_author %}{{ hero_attr | remove: '<pre>by: ' | remove: '</pre>' }}{% endcapture %}
+
+        {% elsif hero_attr contains '<pre>published:' %}
+            {% comment %}
+            Since Talemetry CMS does not have features to set Publish Date,
+            this option has been implemented so the respective Publish Date can be seet
+            Publish Date has to be added inside the HERO section, with the following format: '<pre>published: YYYY-MM-DD</pre>'
+            {% endcomment %}
+            {% capture cb_hero_publish_date %}{{ hero_attr | remove: '<pre>published: ' | remove: '</pre>' }}{% endcapture %}
+
+        {% elsif hero_attr contains '<pre>modified:' %}
+            {% comment %}
+            Since Talemetry CMS does not have features to set Modified Date,
+            this option has been implemented so the respective Modified Date can be seet
+            Modified Date has to be added inside the HERO section, with the following format: '<pre>modified: YYYY-MM-DD</pre>'
+            {% endcomment %}
+            {% capture cb_hero_modified_date %}{{ hero_attr | remove: '<pre>modified: ' | remove: '</pre>' }}{% endcapture %}
+
+        {% endif %}
+
+        {% if cb_hero_heading != blank and cb_hero_author != blank and cb_hero_publish_date != blank and cb_hero_modified_date != blank %}
+            {% break %}
+        {% endif %}
+    {% endfor %}
+
+    {% capture cb_hero_body %}{{ page_hero | remove: cb_hero_heading | replace: 'h2','p' }}{% endcapture %}
+    {% capture cb_hero_heading %}{{ cb_hero_heading | remove: '<h1>' | remove: '</h1>' }}{% endcapture %}
+    {% capture cb_page_hero %}{{ page_hero | replace: '<h1>','<h1 id="main" tabindex="-1">' }}{% endcapture %}
+
+{% else %}
+    {% capture cb_non_hero %}{{ page_section_object_content }}{% endcapture %}
+
+{% endif %}

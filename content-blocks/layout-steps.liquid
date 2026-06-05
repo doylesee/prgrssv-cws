@@ -1,0 +1,41 @@
+{% capture page_content_formatted %}{{ page_section_content | replace_global_regex: '\n|\r','' | replace: '<pre>ITEM ENDITEM START</pre>','</div>------<div class="item">' | replace: '<pre>ITEM START</pre>','---<div class="item">' | replace: '<pre>ITEM END</pre>','</div>---' }}{% endcapture %}
+{% assign page_content_array = page_content_formatted | split: '---' | assign_to: 'page_elements' %}
+
+{% capture column_contents %}{% endcapture %}
+
+{{ 0 | assign_to: 'item_index' }}
+{% for page_element in page_elements %}
+	{% if page_element contains '<div class="item">' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+		<div class="columns large-4 end space-foundation">
+			<div class="steps-item same-height-item-js">
+				{{ page_element }}
+			</div>
+		</div>
+		{% endcapture %}
+
+		{{ item_index | plus: 1 | assign_to: 'item_index' }}
+
+	{% elsif page_element != '' %}
+		{% capture column_contents %}
+		{{ column_contents }}
+		<div class="column space-large">
+			{% if column_contents != blank %}
+				<div class="padded-v-large"></div>
+			{% endif %}
+			{{ page_element }}
+		</div>
+		{% endcapture %}
+	{% endif %}
+{% endfor %}
+
+<div class="page-section">
+	<div class="row">
+		<div class="column {{ cb_classes_column_narrow }}">
+			<div class="row same-height-parent-js" data-module="steps">
+				{{ column_contents | replace: 'src=','loading="lazy" src=' }}
+			</div>
+		</div>
+	</div>
+</div>

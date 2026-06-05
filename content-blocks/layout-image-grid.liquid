@@ -1,0 +1,45 @@
+{% capture page_element_content_formatted %}{{ page_section_content | replace: '<p>','---<p>' | replace: '</p>','</p>---' }}{% endcapture %}
+{% assign page_element_content_array = page_element_content_formatted | split: '---' | assign_to: 'page_element_attrs' %}
+
+{% for page_element_attr in page_element_attrs %}
+	{% if page_element_attr != blank %}
+		{% if forloop.index == 2 %}
+			{% capture page_content_left %}{{ page_element_attr | remove: '<p>' | remove: '</p>' }}{% endcapture %}
+		{% else %}
+			{% capture page_content_right %}
+			{{ page_content_right }}
+			{{ page_element_attr }}
+			{% endcapture %}
+		{% endif %}
+	{% endif %}
+{% endfor %}
+
+<div class="row" data-module="callout">
+	<div class="column">
+		<div class="relative-container layer-1">
+			<div class="image-grid-outline">
+				<div class="row full-height">
+					<div class="column {{ cb_classes_column_wide }} full-height">
+						<div class="image-grid-outline-inner"></div>
+					</div>
+				</div>
+			</div><!--close .image-grid-outline-->
+			<div class="image-grid">
+				<div class="row">
+					<div class="column {{ cb_classes_column_narrow }} relative-container layer-2">
+						<div class="row">
+							<div class="columns large-6">
+								<div class="image-container">
+									{{ page_content_left | replace: 'src=','loading="lazy" src=' }}
+								</div>
+							</div>
+							<div class="columns large-5 large-offset-1 image-grid__copy">
+								{{ page_content_right | replace: 'src=','loading="lazy" src=' }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--close .image-grid-->
+		</div>
+	</div>
+</div>
