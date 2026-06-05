@@ -2,7 +2,7 @@
 
 ## Project Overview
 <pre>
-<b>Project:</b>   Progressive Insurance Careers Site
+<b>Project:</b>   Progressive Insurance Careers
 <b>Role:</b>      Lead UI Developer & Technical Project Liaison
 <b>Tools:</b>     Liquid, HTML5, CSS3, JavaScript / jQuery, Foundation, Google Lighthouse
 </pre>
