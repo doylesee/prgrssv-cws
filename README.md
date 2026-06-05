@@ -11,18 +11,18 @@
 <br />
 
 ## The Challenge
-This initiative was a massive "lift-and-shift" migration project, moving Progressive's complete enterprise recruitment portal from a third-party vendor over to our proprietary platform.
+This initiative was a massive "lift-and-shift" migration project, moving Progressive's complete enterprise recruitment portal from a third-party vendor over to our platform.
 
 The project introduced severe logistical and technical bottlenecks:
 
 **Massive Content Scale**<br />
-The migration encompassed hundreds of high-traffic pages across widely distinct pages (Category pages, Team page, and Blogs). Every single page required complete layout accuracy, precise asset mapping, and meticulous manual migration of deeply embedded SEO metadata, with the project to be completed on a very tight timeline.
+The migration encompassed hundreds of high-traffic pages across widely distinct pages (Category pages, Team page, and Blogs). Every single page required complete layout accuracy, precise asset mapping, and meticulous manual migration of embedded SEO metadata, with the project to be completed on a very tight timeline.
 
 **SEO Retention & Redirects**<br />
-To preserve years of established search indexing, a massive map of explicit URL redirects had to be tracked and configured perfectly to prevent broken links.
+To preserve years of established search indexing, a massive map of URL redirects had to be tracked and configured perfectly to prevent broken links.
 
 **CMS Structural Limitations**<br />
-Progressive's internal recruitment team needed the capability to update and manage these varied contents post-launch. However, our destination platform only provided a single, primitive WYSIWYG text editor field, making the management of custom and complex layouts like multi-column structural cards, interactive FAQs, and media carousels inherently impossible for non-technical users.
+Progressive's recruitment team needed the capability to update and manage these varied contents post-launch. However, our destination platform only provided a single WYSIWYG text editor field, making the management of custom and complex layouts like multi-column structural cards, interactive FAQs, and media carousels inherently impossible for non-technical users.
 
 <br />
 
@@ -40,7 +40,7 @@ Program a backend abstraction layer to transform raw WYSIWYG text inputs into be
 Spearhead the operational roadmap, manage requirements-gathering, and coordinate client-side User Acceptance Testing (UAT).
 
 **Performance & Accessibility Auditing**<br />
-Achieve high-tier web optimization and adherence to rigid corporate WCAG web accessibility regulations.
+Achieve high-tier web optimization and adherence to rigid corporate WCAG web accessibility standards.
 
 **Empowering Client Handoff**<br />
 Create comprehensive, step-by-step user documentation to guarantee a seamless post-launch transition and empower non-technical administrators to manage the site independently.
@@ -63,19 +63,19 @@ Designed a highly structured per-page folder hierarchy that centralized copy, im
 Took full accountability for directing and monitoring the User Acceptance Testing phase, rapidly resolving edge-case bugs raised by the client.
 
 ### 2. Developing the WYSIWYG Code Compiler
-To empower the non-technical Progressive talent acquisition team to manage page contents independently, I utilized Liquid Markup to intercept raw user content. I created an internal parsing matrix that checked for simple user-typed text markers wrapped in basic HTML tags (such as SECTION 3-COLUMN TILES START or SECTION FAQ START).
+To empower the non-technical recruitment team to manage page contents independently, I utilized Liquid Markup to intercept raw user content. I created an internal parsing matrix that checked for simple user-typed text markers wrapped in basic HTML tags (such as SECTION 3-COLUMN TILES START or SECTION FAQ START).
 
 My backend parser systematically processed these strings, stripped erratic code formatting, checked for design modifier styles (like background-1 through background-3), and cleanly injected corresponding design fragments (like layout-team-tiles or layout-video-player) dynamically. If an author published a blog post, the engine went a step further by dynamically identifying the opening text block, pulling the first word, and formatting a stylish, stylized drop-cap letter purely via code logic.
 
 ### 3. Client Enablement & Training Documentation
 To bridge the gap between my custom technical architecture and the non-technical recruitment team, I wrote a comprehensive Content Management Documentation Guide. This documentation served as a definitive future reference tool, detailing exactly how to use the special formatting text markers to trigger advanced layouts. 
 
-By outlining clear visual formatting rules, detailing component variations, and providing copy-pasteable layout tokens, I removed the guesswork from their workflow and guaranteed an incredibly smooth operational transition during the platform handoff.
+By outlining clear visual formatting rules, detailing component variations, and providing intuitive copy-pasteable layout variables, I removed the guesswork from their workflow and guaranteed an incredibly smooth operational transition during the platform handoff.
 
 ### 4. Automated Performance Optimization & Auditing
 With hundreds of pages densely packed with heavy corporate media assets, web optimization was critical. I built asset performance rules into the core layout loop that targeted text and image sections. The code dynamically audited elements and appended native loading="lazy" tags to images, forcing the browser to defer downloading below-the-fold graphics until scrolled into view.
 
-I rigorously monitored performance metrics using Google Lighthouse. My semantic, modular frontend code achieved exceptional raw performance scores fluctuating between 85 and 95, ensuring a highly performant and stable foundation despite heavy tracking scripts and external CMS application layers.
+I rigorously monitored performance metrics using Google Lighthouse. My semantic, modular frontend code achieved exceptional raw performance scores between 85 and 95, ensuring a highly performant and stable foundation despite heavy tracking scripts and external CMS application layers.
 
 <br />
 
@@ -87,7 +87,7 @@ Successfully migrated and launched hundreds of content-heavy web pages completel
 Successfully secured historical organic traffic rankings through precision mapping, with zero downtime or broken paths recorded during the vendor transition.
 
 **Autonomous Non-Technical Management & Seamless Handoff**<br />
-Transformed a highly restrictive single-field CMS editor into an intuitive component builder. Supported by my comprehensive documentation, the Progressive talent acquisition brand team gained full creative autonomy to update and scale web pages completely independently, requiring zero post-launch engineering oversight.
+Transformed a highly restrictive single-field CMS editor into an intuitive component builder. Supported by my comprehensive documentation, the Progressive recruitment team gained full creative autonomy to update and scale web pages completely independently, requiring zero post-launch engineering oversight.
 
 **Exceptional Technical Engineering Metrics**<br />
 Achieved pristine, responsive page-load speeds with Google Lighthouse scores landing as high as 95, proving that highly dynamic, accessible content code can perform seamlessly at scale.
