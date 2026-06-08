@@ -4,9 +4,9 @@
 <b>Role:</b>      Lead UI Developer & Technical Project Liaison
 <b>Tools:</b>     Liquid, HTML5, CSS3, JS/jQuery, Foundation, Google Lighthouse
 </pre>
-&nbsp;<strong><a href="https://careers.progressive.com/">View project</a></strong>
+&nbsp;<strong><a href="https://careers.progressive.com/" rel="noopener noreferrer">View project</a></strong>
 
-<p><a href="https://careers.progressive.com/"><img src="https://doylesee.github.io/prgrssv-cws/thumbnail.jpg" /></a></p>
+<p><a href="https://careers.progressive.com/" rel="noopener noreferrer"><img src="https://doylesee.github.io/prgrssv-cws/thumbnail.jpg" /></a></p>
 <br />
 
 ## The Challenge
@@ -91,4 +91,4 @@ Transformed a highly restrictive single-field CMS editor into an intuitive compo
 **Exceptional Technical Engineering Metrics**<br />
 Achieved pristine, responsive page-load speeds with Google Lighthouse scores landing as high as 95, proving that highly dynamic, accessible content code can perform seamlessly at scale.
 
-<br /><strong><a href="https://careers.progressive.com/">View project</a></strong>
+<br /><strong><a href="https://careers.progressive.com/" rel="noopener noreferrer">View project</a></strong>
