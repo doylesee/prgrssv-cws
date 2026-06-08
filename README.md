@@ -26,22 +26,22 @@ Progressive's recruitment team needed the capability to update and manage these 
 <br />
 
 ## Core Objectives
-**Enterprise-Scale Content Migration**<br />
+🟠 **Enterprise-Scale Content Migration**<br />
 Seamlessly transition hundreds of content-heavy, distinct pages into a unified platform architecture without data loss.
 
-**SEO & URL Mapping Continuity**<br />
+🟠 **SEO & URL Mapping Continuity**<br />
 Maintain historical search engine rankings by mapping and configuring proper URL redirect structures across every single legacy page.
 
-**No-Code Layout Parsing Engine**<br />
+🟠 **No-Code Layout Parsing Engine**<br />
 Program a backend abstraction layer to transform raw WYSIWYG text inputs into beautiful, accessible components dynamically.
 
-**Cross-Functional Project Management**<br />
+🟠 **Cross-Functional Project Management**<br />
 Spearhead the operational roadmap, manage requirements-gathering, and coordinate client-side User Acceptance Testing (UAT).
 
-**Performance & Accessibility Auditing**<br />
+🟠 **Performance & Accessibility Auditing**<br />
 Achieve high-tier web optimization and adherence to rigid corporate WCAG web accessibility standards.
 
-**Empowering Client Handoff**<br />
+🟠 **Empowering Client Handoff**<br />
 Create comprehensive, step-by-step user documentation to guarantee a seamless post-launch transition and empower non-technical administrators to manage the site independently.
 
 <br />
@@ -79,16 +79,16 @@ I rigorously monitored performance metrics using Google Lighthouse. My semantic,
 <br />
 
 ## Results & Impact
-**Flawless Enterprise Delivery**<br />
+✅ **Flawless Enterprise Delivery**<br />
 Successfully migrated and launched hundreds of content-heavy web pages completely on-schedule, keeping Progressive's massive recruitment ecosystem intact.
 
-**Preserved Traffic Optimization**<br />
+✅ **Preserved Traffic Optimization**<br />
 Successfully secured historical organic traffic rankings through precision mapping, with zero downtime or broken paths recorded during the vendor transition.
 
-**Autonomous Non-Technical Management & Seamless Handoff**<br />
+✅ **Autonomous Non-Technical Management & Seamless Handoff**<br />
 Transformed a highly restrictive single-field CMS editor into an intuitive component builder. Supported by my comprehensive documentation, the Progressive recruitment team gained full creative autonomy to update and scale web pages completely independently, requiring zero post-launch engineering oversight.
 
-**Exceptional Technical Engineering Metrics**<br />
+✅ **Exceptional Technical Engineering Metrics**<br />
 Achieved pristine, responsive page-load speeds with Google Lighthouse scores landing as high as 95, proving that highly dynamic, accessible content code can perform seamlessly at scale.
 
 <br /><strong><a href="https://careers.progressive.com/" rel="noopener noreferrer">View project</a></strong>
