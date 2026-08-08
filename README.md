@@ -4,14 +4,13 @@
 <b>Role:</b>      Lead UI Developer & Technical Project Liaison
 <b>Tools:</b>     Liquid, HTML5, CSS3, JS/jQuery, Foundation, Google Lighthouse
 </pre>
-&nbsp;<strong><a href="https://careers.progressive.com/" rel="noopener noreferrer">View project</a></strong>
-<br /><br />
 
 ### Table of Contents
 * [The Challenge](#the-challenge)
 * [Core Objectives](#core-objectives)
 * [My Approach & Implementation](#my-approach--implementation)
 * [Results & Impact](#results--impact)
+* [View Project](https://careers.progressive.com/)
 <br />
 
 ## The Challenge
