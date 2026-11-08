@@ -14,7 +14,7 @@
 <br />
 
 <a href="https://careers.progressive.com">
-  <img src="screenshot.jpg" alt="" width="100%" style="border: 1px solid #ddd;">
+  <img src="screenshot.jpg" alt="" width="100%">
 </a>
 
 ## The Challenge
