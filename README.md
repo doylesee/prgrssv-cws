@@ -13,6 +13,10 @@
 * [View Project](https://careers.progressive.com/)
 <br />
 
+<a href="https://careers.progressive.com">
+  <img src="screenshot.jpg" alt="" width="100%" style="border: 1px solid #ddd;">
+</a>
+
 ## The Challenge
 This initiative was a massive "lift-and-shift" migration project, moving Progressive's complete enterprise recruitment portal from a third-party vendor over to our platform.
 
