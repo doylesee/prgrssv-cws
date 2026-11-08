@@ -1,0 +1,588 @@
+{%- comment -%}
+██╗██╗██╗  ░██████╗████████╗░█████╗░██████╗░  ██╗██╗██╗
+██║██║██║  ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ██║██║██║
+██║██║██║  ╚█████╗░░░░██║░░░██║░░██║██████╔╝  ██║██║██║
+╚═╝╚═╝╚═╝  ░╚═══██╗░░░██║░░░██║░░██║██╔═══╝░  ╚═╝╚═╝╚═╝
+██╗██╗██╗  ██████╔╝░░░██║░░░╚█████╔╝██║░░░░░  ██╗██╗██╗
+╚═╝╚═╝╚═╝  ╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░  ╚═╝╚═╝╚═╝
+
+This code is intended for use and maintenance by authorized Talemetry CWS Developers only.
+If you are not part of the Talemetry CWS Development team, refrain from making any edits or modifications to the code.
+Unauthorized changes may result in functionality issues or unintended errors.
+
+For any updates, questions, or concerns, please contact your Account Manager for assistance.
+
+░█▀▀▀█ ▀█▀ ▀▀█▀▀ ░█▀▀▀ 　 ░█─░█ ░█▀▀▀█ ░█▀▀▀ ░█▀▀▀█ 　 ▀▀█▀▀ ░█─░█ ░█▀▀▀ ░█▀▄▀█ ░█▀▀▀ ░█▀▀▀█ 
+─▀▀▀▄▄ ░█─ ─░█── ░█▀▀▀ 　 ░█─░█ ─▀▀▀▄▄ ░█▀▀▀ ─▀▀▀▄▄ 　 ─░█── ░█▀▀█ ░█▀▀▀ ░█░█░█ ░█▀▀▀ ─▀▀▀▄▄ 
+░█▄▄▄█ ▄█▄ ─░█── ░█▄▄▄ 　 ─▀▄▄▀ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ 　 ─░█── ░█─░█ ░█▄▄▄ ░█──░█ ░█▄▄▄ ░█▄▄▄█
+
+This site utilizes the 'Progressive Theme' for styling and functionality.
+Please update the Theme directly rather than making changes to this site.
+Once updated, ensure the Theme is re-applied to all applicable sites to maintain consistency across the platform.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{%- endcomment -%}
+{% page_required_header %}
+
+{% include '/_config__variables' %}
+
+{% comment %}for similar jobs in Job Details page only {% endcomment %}
+{% if params['ns_similar_jobs'] == '1' %}
+    <div class="similar-jobs--jobs-search-js">
+        {% for similar_job in jobs %}
+            {% if params['ns_job_id'] == similar_job.id %}
+                {% capture is_same_job %}true{% endcapture %}
+
+            {% else %}
+                {% if is_same_job != 'true' and forloop.index == 4 %}
+                    <!--do nothing-->
+                {% else %}
+                    <div class="job-details__similar-jobs-item space-medium">
+                        <h3 class="heading-4 space-none">
+                        {% if cb_site_type == 'internal' %}
+                            <a href="{{ similar_job.url }}/">{{ similar_job.cfdisplay_internaljobtitle }}</a>
+                        {% else %}
+                            {{ similar_job | link_to_job }}
+                        {% endif %}
+                        </h3>
+                        <p>
+                            {% if similar_job.cfm5 != blank %}{{ similar_job.cfm5 }}{% endif %}
+                            {% if similar_job.cfm4 != blank %}{% if similar_job.cfm5 != blank %}<br />{% endif %}{{ simiar_job.cfm4 }}{% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+{% comment %}if not for similar jobs{% endcomment %}
+{% else %}
+    {% comment %}Check if Saved Jobs are not all archived jobs{% endcomment %}
+    {% if params['saved_jobs'] == '1' and jobs.total_entries == 0 %}
+        <script type="text/javascript">
+            var c_jobs_temp = localStorage.getItem('c_jobs') ? JSON.parse(localStorage.getItem('c_jobs')) : [];
+            var current_saved_jobs_url = '{{ request_fullpath }}';
+            var saved_jobs_query = '/jobs/search?external_id[]='+c_jobs_temp.join('&external_id[]=')+'&saved_jobs=1';
+
+            if (saved_jobs_query == current_saved_jobs_url) {
+                localStorage.removeItem('c_jobs');
+                setTimeout(function() {
+                    {% redirect_permanent '/pages/saved-jobs' %}
+                }, 2000);
+            }
+        </script>
+    {% endif %}
+
+    {% capture template_permalink_content_tag %}{{ template.permalink }}-content{% endcapture %}
+    {{ template_permalink_content_tag | pages_with_tag | assign_to: 'template_permalink_content' }}
+
+    {% if params['q'] == blank and params['location'] == blank %}
+        {% assign facet_fields_array = "cfml1;cfml2;cfml3;cfml4;cfml5;cfml6;cfml7;cfml8;cfml9;cfml10" | split: ';' | assign_to: 'facet_fields' %}
+        {% for facet_field in facet_fields %}
+            {% if params[facet_field] != blank %}
+                {% capture facet_field_value %}-{{ params[facet_field]  | replace: '/','-' | replace: ' - ','-' | replace: ' ','-' | downcase  }}{% endcapture %}
+                {% assign facet_tag = facet_tag | append: facet_field_value | lstrip %}                
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% capture facet_content_tag %}search-{{ facet_tag | remove_first: '-' }}-jobs-content{% endcapture %}
+    {{ facet_content_tag | pages_with_tag | assign_to: 'facet_content' }}
+
+    {% if template_permalink_content.size > 0 %}
+        {% capture jobs_category_content_tag %}{{ template_permalink_content_tag }}{% endcapture %}
+    {% elsif facet_content.size > 0 %}
+        {% capture jobs_category_content_tag %}{{ facet_content_tag }}{% endcapture %}
+    {% else %}
+        {% capture jobs_category_content_tag %}search-jobs-content{% endcapture %}
+    {% endif %}
+
+    {{ jobs_category_content_tag | pages_with_tag | assign_to: 'jobs_category_content' }}
+
+    <div class="page-details-wrapper">
+        <div class="jobs-category-banner">
+            {% if jobs_category_content.size > 0 %}
+                {% if jobs_category_content[0].images.size > 1 %}
+                    <img src="{{ jobs_category_content[0].images[1].url }}" alt="{{ jobs_category_content[0].title }}" class="full-width" loading="lazy" />
+                {% else %}
+                    <img src="{{ jobs_category_content[0].images[0].url }}" alt="{{ jobs_category_content[0].title }}" class="full-width" loading="lazy" />
+                {% endif %}
+            {% endif %}
+        </div>
+                
+        <div class="padded-v-xlarge">
+
+            <div class="jobs-category-section">
+                <div class="hide">
+                    {{ notificationlabel | candidate_job_notification_link }}
+                </div>
+                <div class="row">
+                    <div class="columns {{ cb_classes_column_narrow }}">
+                        {% if params['saved_jobs'] == '1' %}
+                            <h1 id="main" tabindex="-1">Saved Jobs</h1>
+                        {% elsif jobs_category_content.size > 0 %}
+                            <h1 id="main" tabindex="-1">{{ jobs_category_content[0].title }}</h1>
+                            {{ jobs_category_content[0].content }}
+                        {% elsif params['q'] != blank or params['ns_location'] != blank or params['location'] != blank %}   
+                            <h1 id="main" tabindex="-1">
+                                {{ jobs.total_entries }}
+                                {% if params['q'] != blank %}
+                                    {{ params['q'] | escape_html }} jobs
+                                {% endif %}
+
+                                {% if params['ns_location'] != blank and params['q'] != blank %}
+                                    in
+                                {% endif %}
+
+                                {% if params['location'] != blank and params['q'] != blank %}
+                                    in
+                                {% endif %}
+
+                                {% if params['ns_location'] != blank %}
+                                    {{ params['ns_location'] }}
+                                {% endif %}
+
+                                {% if params['location'] != blank %}
+                                    {{ params['location'] }}
+                                {% endif %}
+
+                                {% if params['q'] == blank %}
+                                    jobs
+                                {% endif %}
+
+                                found
+                            </h1>
+                        {% else %}
+                            <h1 id="main" tabindex="-1">Job Search Results</h1>
+                            {% if params['ns_inactive_job'] == '1' %}
+                                <p>This job posting you were looking for is no longer active. Please search for other jobs instead.</p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div><!--close .jobs-category-section-->
+
+            <div class="jobs-heading space-large">
+                <div class="row">
+                    <div class="columns {{ cb_classes_column_narrow }}">
+                        <div class="small-text space-medium">
+                            {% if jobs.total_entries > 0 %}
+                                {% if params['page'] == blank or params['page'] == 1 %}
+                                    Showing 1-{{ jobs.length }} of {{ jobs.total_entries }} result{% if jobs.total_entries > 1 %}s{% endif %}
+                                {% else %}
+                                    {% if params['per_page'] == blank %}
+                                        {% capture tal_per_page %}25{% endcapture %}
+                                    {% else %}
+                                        {% capture tal_per_page %}{{ params['per_page'] }}{% endcapture %}
+                                    {% endif %}
+                                    {% capture tal_jobs_length %}{{ tal_per_page | minus: jobs.length }}{% endcapture %}
+                                    Showing {{ params['page'] | minus: 1 | times: tal_per_page | plus: 1 }}-{{ tal_per_page | times: params['page'] | minus: tal_jobs_length }} of {{ jobs.total_entries }} result{% if jobs.total_entries > 1 %}s{% endif %}
+                                {% endif %}
+                            {% endif %}
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div><!--close .jobs-heading-->
+
+            <div class="row">
+                <div class="column {{ cb_classes_column_wide }}">
+                    <div class="row">
+                        {% if jobs.total_entries > 0 and params['saved_jobs'] != '1' %}
+                            <div class="columns large-4 xlarge-3">
+                                <div class="facet-section">
+                                    <section class="space-medium">
+                                        {% capture has_multiple_facet_options %}false{% endcapture %}
+                                        <div class="facet-section__heading non-facet hide---">
+                                            <!-- <a href="javascript:void(0);" class="facet-filter-results-button branded-button-3 full-width hide-for-large" rel="nofollow">Filter Your Results</a> -->
+                                            <button class="facet-filter-results-button branded-button-3 full-width hide-for-large">Filter Your Results</button>
+                                            <h2 class="heading-4 show-for-large">Filter Your Results <span class="facet-section__clear-all small-text"><a href="/search/jobs/" rel="nofollow" class="facet-item__option-link js show-for-large">Clear All</a></span></h2>
+                                        </div>
+
+                                        <div class="facet-section-inner">
+                                            <div class="facet-section-inner-2 background-white">
+                                                <!-- Assigning the Facets -->
+                                                {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}
+                                                    {% capture facet_setup %}
+                                                    Hot Job, cfm24_seo, single, asc, 10, 100, collapsed;
+                                                    Category, cfm5_seo, multi, asc, 10, 100, collapsed;
+                                                    State, location_state_seo, multi, asc, 10, 100, collapsed;
+                                                    City, location_city_seo, multi, asc, 10, 100, collapsed;
+                                                    Remote Work, remote_work_seo, multi, asc, 10, 100, collapsed;
+                                                    Job Description Library Category, cfm6_seo, multi, asc, 10, 100, collapsed;
+                                                    Job Level, cfm4_seo, multi, asc, 10, 100, collapsed;
+                                                    Job Grade, cfm23_seo, multi, asc, 10, 100, collapsed;
+                                                    {% endcapture %}
+                                                {% else %}
+                                                    {% capture facet_setup %}
+                                                    Hot Job, cfm24_seo, single, asc, 10, 100, collapsed;
+                                                    Category, cfm5_seo, multi, asc, 10, 100, collapsed;
+                                                    State, location_state_seo, multi, asc, 10, 100, collapsed;
+                                                    City, location_city_seo, multi, asc, 10, 100, collapsed;
+                                                    Remote Work, remote_work_seo, multi, asc, 10, 100, collapsed;
+                                                    Job Level, cfm4_seo, multi, asc, 10, 100, collapsed;
+                                                    {% endcapture %}
+                                                {% endif %}
+
+                                                {{ facet_setup | split: ';' | assign_to: 'facet_setup_split' }}
+
+                                                {% for facet_attrs in facet_setup_split %}
+                                                    <!-- Setting variables for the Facet attributes -->
+                                                    {{ facet_attrs | split: ', ' | assign_to: 'facet_attr' }}
+                                                    {% assign facet_heading = facet_attr[0] %}
+                                                    {% assign facet_field = facet_attr[1] %}
+                                                    {% assign facet_type = facet_attr[2] %}
+                                                    {% assign facet_order = facet_attr[3] %}
+                                                    {% assign facet_num_display = facet_attr[4] %}
+                                                    {% assign facet_num_limit = facet_attr[5] %}
+                                                    {% assign facet_expanded = facet_attr[6] %}
+
+                                                    {% capture facet_num_display_int %}{{ facet_num_display }}{% endcapture %}
+                                                    {% assign facet_num_display_int = facet_num_display_int | times: 1 %}
+
+                                                    <!-- Setting the Facets -->
+                                                    {% if facet_type == "multi" %}
+                                                        {{ facet_field | facet_multi: facet_num_limit, facet_order | assign_to: 'fa' }}
+                                                        {% assign facets = fa %}
+                                                    {% else %}
+                                                        {{ facet_field | facet_single: facet_num_limit, facet_order | assign_to: 'fa' }}
+                                                        {% assign facets = fa %}
+                                                    {% endif %}
+
+                                                    {% assign facet_results = facets[facet_field] %}
+
+                                                    {{ facet_field | selected_facets_by_name | assign_to: 'fas' }}
+                                                    {% assign facet_select = fas %}
+
+                                                    {% if facet_results.size > 0 or facet_select.size >= 1 %}
+                                                        {% if has_multiple_facet_options == 'false' %}
+                                                            {% comment %}<script>$('.facet-section__heading').removeClass('hide');</script>{% endcomment %}
+                                                        {% endif %}
+                                                        {% capture has_multiple_facet_options %}true{% endcapture %}
+                                                            
+                                                        {% if facet_select.size >= 1 %}
+                                                            <!-- Set variable to store Facet option Clear Filter link -->
+                                                            {% assign clear_filter = "" %}
+                                                            {% capture clear_filter %}{{ facet_field | get_facet_url_sans }}{% endcapture %}
+                                                        {% endif %}
+
+                                                        <div class="facet-item padded-v-small {% if facet_select.size < 1 and facet_expanded != 'expanded' %}facet-item--collapsed plus{% else %}facet-item--expanded minus{% endif %}">
+                                                            <div class="facet-item__heading">
+                                                                {% comment %}<a href="javascript:void(0);" class="heading-5 space-none js" rel="nofollow">{{ facet_heading }} <span class="facet-item__heading-expand-collapse"></span></a>{% endcomment %}
+                                                                <button class="heading-5 space-none js" aria-expanded="false">{{ facet_heading }} <span class="facet-item__heading-expand-collapse"></span></button>
+                                                            </div>
+                                                            <div class="facet-item__options">
+                                                                {% assign facet_num_limit_counter = "0" %}
+                                                                {% for facet in facet_results %}
+                                                                    {% if facet['permalink'] != "" %}
+
+                                                                        {% if facet_num_limit_counter == "0" %}
+                                                                            <div class="facet-item__row">
+                                                                        {% endif %}
+
+                                                                        {% if facet_num_limit_counter == facet_num_display %}
+                                                                            </div>
+
+                                                                            <div class="small-text"><a class="facet-item__show-more js" ref="{{ facet_field }}" href="javascript: void(0);" rel="nofollow">+ Show more</a></div>
+
+                                                                            <div class="facet-item__row facet-item__row--hidden" id="facet-item__row--{{ facet_field }}">
+                                                                        {% endif %}
+
+                                                                        <div class="facet-item__options-item clearfix">
+                                                                            <a href="{{ facet['query'] }}/" class="facet-item__option-link js padded-v-xsmall"{% if facet_select.size >= 1 %} rel="nofollow"{% endif %}>
+                                                                                <span class="facet-item__options-item-type facet-item__options-item-type--{{ facet_type }} {% if facet['is_selected'] == true %}facet-item__options-item-type--selected{% endif %}"></span>
+                                                                                <span class="facet-item__option-item-label small-text">{{ facet["label"] }}</span>
+                                                                                <span class="facet-item__option-item-count small-text">{{ facet["count"] }}<span class="show-for-sr">jobs</span></span>
+                                                                                <span class="show-for-sr">{% if facet['is_selected'] == true %}selected{% endif %}</span>
+                                                                            </a>
+                                                                        </div>
+                                                                        {% capture facet_num_limit_counter %}{{ facet_num_limit_counter | plus: '1' }}{% endcapture %}
+                                                                    {% endif %}
+
+                                                                    {% if forloop.last and facet_num_limit_counter != "0" %}
+                                                                        </div>
+                                                                    {% endif %}
+
+                                                                    <!--Keep select facets after "Show More" open-->
+                                                                    {% if facet['is_selected'] == true and forloop.index > facet_num_display_int %}
+                                                                        <script>
+                                                                            $('.facet-item__show-more.js').addClass('hide');
+                                                                            $('.facet-item__row--hidden').removeClass('facet-item__row--hidden');
+                                                                        </script>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div><!--close .facet-item__options-->
+                                                            {% if facet_select.size >= 1 %}<div><a href="{{ clear_filter }}" class="facet-item__heading-clear small-text" rel="nofollow">Clear Filters</a></div>{% endif %}
+                                                        </div><!--close .facet-item-->
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <div class="space-medium"></div>
+                                                <span class="hide-for-large">
+                                                    <a href="/search/jobs/">Clear All</a>
+                                                    &nbsp;&nbsp;
+                                                    <a href="javascript:void(0);" class="facet-filter-results-button" rel="nofollow">Close</a>
+                                                </span>
+                                            </div>
+                                        </div><!--close .facet-section-inner-->
+                                    </section>
+
+                                    <div class="space-large non-facet">
+                                        <p>
+                                            <!-- <a href="javascript:void(0);" class="candidate-notification-link branded-button-3 full-width" rel="nofollow">Set Up Job Alerts</a> -->
+                                            <button class="candidate-notification-link branded-button-3 full-width">Set Up Job Alerts</button>
+                                        </p>
+                                    </div>
+
+                                    <section class="job-search-personalization non-facet show-for-large">
+                                        {% if visitor.recent_jobs.total_entries > 0 and cb_site_type != 'internal' %}{% comment %}Customer wants to use a custom field for the Job Title, but custom fields are not supported for Personalization{% endcomment %}
+                                            <div class="padded-v-small space-small">
+                                                <div class="visitor-item-wrapper space-medium">
+                                                    <h2 class="heading-4 space-small">Recently Viewed Jobs</h2>
+                                                    {% for job_data in visitor.recent_jobs limit: 5 %}
+                                                        <div class="visitor-item space-small"><a href="{{job_data.url}}" rel="nofollow">{{ job_data.title }}</a></div>
+                                                    {% endfor %}
+                                                </div><!--close .visitor-item-wrapper-->
+                                            </div><!--close .branded-box-->
+                                        {% else %}
+                                            {% comment %}
+                                            <div class="space-small"><span class="branded-button-outer branded-button-1-outer branded-button-wide-outer">{{ "Personalize your experience" | link_to_social_login }}</span></div>
+                                            <!-- <span class="small-text"><a href="{{career_site.enable_tracking_url}}" rel="nofollow">Click here to enable personalized experience</a></span> -->
+                                            {% endcomment %}
+                                        {% endif %}
+                                    </section>
+                                </div><!--close .facet-section-->
+                            </div>
+                        {% endif %}
+
+                        <div class="columns{% if jobs.total_entries > 0 and params['saved_jobs'] != '1' %} large-8 xlarge-9{% endif %}">
+                            <section>
+                                <div class="jobs-section">
+                                    <div class="preloader preloader--search">
+                                        <div class="facet-jobs-loading hide--- hide-for-print" role="alert" aria-labelledby="facet-jobs-loading">
+                                            <div class="show-for-sr"><label id="facet-jobs-loading">Loading jobs</label></div>
+                                        </div>
+                                    </div>
+                                    <div class="jobs-section__inner">
+                                        {% if no_results_found %}
+                                            <p>No jobs found matching your search. Please try again or <a href="javascript:void(0);" class="candidate-notification-link" rel="nofollow">set up a job alert</a>.</p>
+                                        {% else %}
+                                            <script>var current_year = new Date().getFullYear();</script>
+                                            <div class="jobs-section__list non-facet space-xlarge">
+                                                <div class="branded-search space-small hide-for-xlarge">
+                                                    <label for="sortby-mobile" class="show-for-sr">Sort by:</label> 
+                                                    <select class="sortby-mobile" id="sortby-mobile">
+                                                        <option>Sort{% if params['sort_by'] != blank %}ed{% endif %} by {{ params['sort_by'] | replace: 'default','Relevance' | replace: 'title','Job Title' | replace: 'location_city','Location' | replace: 'updated_at','Date Posted' | replace: 'cfm25','Job Number' }}</option>
+                                                        <option value="default">Relevance</option>
+                                                        <option value="title">Job Title</option>
+                                                        <option value="location_city">Location</option>
+                                                        {% if cb_site_type == 'internal' %}<option value="cfm25">Job Number</option>{% endif %}
+                                                        <option value="updated_at">Date Posted</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="facet-jobs-loaded hide--- hide-for-print" role="alert" aria-labelledby="facet-jobs-loaded">
+                                                    <div class="show-for-sr">
+                                                        <label id="facet-jobs-loaded">
+                                                            {% if jobs.total_entries > 0 %}
+                                                                {% if params['page'] == blank or params['page'] == 1 %}
+                                                                    Showing 1-{{ jobs.length }} of {{ jobs.total_entries }} result{% if jobs.total_entries > 1 %}s{% endif %}
+                                                                {% else %}
+                                                                    {% if params['per_page'] == blank %}
+                                                                        {% capture tal_per_page %}25{% endcapture %}
+                                                                    {% else %}
+                                                                        {% capture tal_per_page %}{{ params['per_page'] }}{% endcapture %}
+                                                                    {% endif %}
+                                                                    {% capture tal_jobs_length %}{{ tal_per_page | minus: jobs.length }}{% endcapture %}
+                                                                    Showing {{ params['page'] | minus: 1 | times: tal_per_page | plus: 1 }}-{{ tal_per_page | times: params['page'] | minus: tal_jobs_length }} of {{ jobs.total_entries }} result{% if jobs.total_entries > 1 %}s{% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </label>
+                                                    </div>
+                                                </div><!--close .facet-loaded-jobs-->
+                                                
+                                                <div class="jobs-section__heading show-for-xlarge">
+                                                    <div class="row">
+                                                        <div class="columns {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}xlarge-5{% else %}xlarge-6{% endif %}">
+                                                            <h3 class="heading-5"><a class="sort-button" href="javascript:sortjobs('title');" rel="nofollow">Job Title &nbsp;<i class="fa-solid fa-sort" aria-hidden="true" rel="nofollow"></i></a></h3>
+                                                        </div>
+                                                        <div class="columns {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}xlarge-3{% else %}xlarge-4{% endif %}">
+                                                            <h3 class="heading-5"><a class="sort-button" href="javascript:sortjobs('location_city');" rel="nofollow">Location &nbsp;<i class="fa-solid fa-sort" aria-hidden="true"></i></a></h3>
+                                                        </div>
+                                                        {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}
+                                                        <div class="columns xlarge-2">
+                                                            <h3 class="heading-5"><a class="sort-button" href="javascript:sortjobs('cfm25');" rel="nofollow">Job Number &nbsp;<i class="fa-solid fa-sort" aria-hidden="true"></i></a></h3>
+                                                        </div>
+                                                        {% endif %}
+                                                        <div class="columns xlarge-2">
+                                                            <h3 class="heading-5"><a class="sort-button" href="javascript:sortjobs('updated_at');" rel="nofollow">Date Posted &nbsp;<i class="fa-solid fa-sort" aria-hidden="true"></i></a></h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <script>
+                                                    // Sort by functionality
+                                                    $('.sortby-mobile').change(function() {
+                                                        sortjobs($(this).val());
+                                                    });
+                                                    
+                                                    function sortjobs(new_sortfield) {
+                                                        var current_job_url = '{{ request_fullpath | escape_javascript | replace: '%2C',',' }}';
+                                                        {% capture params_sortby_escaped %}{{ params['sort_by'] | escape_javascript }}{% endcapture %}
+                                                        var params_sortby_escaped = '{{ params_sortby_escaped }}';
+                                                        var current_sortfield = '';
+                                                        var current_sortorder = '';
+                                                        var new_sortorder = '';
+                                                        var new_job_url = '';
+
+                                                        {% if params['sort_by'] != blank %}
+                                                            {% assign sortbyfield = params_sortby_escaped | split: ',' | assign_to: 'sortby_params' %}
+                                                            current_sortfield = '{{ sortby_params[0] }}';
+                                                            current_sortorder = '{{ sortby_params[1] }}';
+                                                        {% endif %}
+
+                                                        if (new_sortfield == 'default') {
+                                                            new_sortorder = '';
+                                                        }
+                                                        else if (new_sortfield == current_sortfield) {
+                                                            if (current_sortorder == 'asc') {
+                                                                new_sortorder = ',desc';
+                                                            }
+                                                            else {
+                                                                new_sortorder = ',asc';
+                                                            }
+                                                        }
+                                                        else {
+                                                            new_sortorder = ',asc'; 
+                                                        }
+
+                                                        {% if params['sort_by'] != blank %}
+                                                            new_job_url = current_job_url.replace('{{ params_sortby_escaped }}',new_sortfield+new_sortorder);
+                                                        {% elsif request_fullpath contains '?' %}
+                                                            new_job_url = current_job_url+'&sort_by='+new_sortfield+new_sortorder;
+                                                        {% else %}
+                                                            new_job_url = current_job_url+'/?sort_by='+new_sortfield+new_sortorder;
+                                                        {% endif %}
+                                                        ds_tm_get_jobs_ajax(new_job_url);
+                                                    }
+                                                </script>
+                                                {% for job in jobs %}
+                                                    <div class="jobs-section__item padded-v-small">
+                                                        <div class="row">
+                                                            <div class="columns {% if cb_site_type == 'internal' %}xlarge-5{% else %}xlarge-6{% endif %}">
+                                                                {% assign date_job = job.created_at | date: '%s' %}
+                                                                {% assign date_current = 'now' | date: '%s' %}
+                                                                {% assign diff_seconds = date_current | minus: date_job %}
+                                                                {% assign diff_days = diff_seconds | divided_by: 3600.0 | divided_by: 24.0 %}
+                                                                <h4 class="space-none">
+                                                                    {% if cb_site_type == 'internal' %}
+                                                                        <a href="{{ job.url }}/">{{ job.cfdisplay_internaljobtitle }}</a>
+                                                                    {% else %}
+                                                                        {{ job | link_to_job | replace: '">','/">' }}
+                                                                    {% endif %}
+
+                                                                    {% comment %}
+                                                                    Removing "new" indicator as per Tami:
+                                                                    In reviewing the Career Site Requrements Doc, I noticed that we did not want to indicate New jobs..but in looking, all Career Sites have a New jobs have  indicator,  Maybe I missed a change to the requirement?
+                                                                    {% if diff_days < 13.5 %}<sup class="small-text color-5">NEW</sup>{% endif %}
+                                                                    {% endcomment %}
+                                                                </h4>
+                                                            </div>
+                                                            <div class="columns {% if cb_site_type == 'internal' %}xlarge-3{% else %}xlarge-4{% endif %}">
+                                                                <span class="hide">Location: </span>
+                                                                {% capture job_location_state_prov_short_no_digit %}{{ job.location.state_prov_short | replace_global_regex: "[\d]", ":::" }}{% endcapture %}
+                                                                {% if job_location_state_prov_short_no_digit contains ':::' %}
+                                                                    {% capture job_state_prov %}{{ job.location.state_prov }}{% endcapture %}
+                                                                {% else %}
+                                                                    {% capture job_state_prov %}{{ job.location.state_prov_short }}{% endcapture %}
+                                                                {% endif %}
+
+                                                                {% if job.location.city != blank %}
+                                                                    {{ job.location.city }}{% if job.location.city != blank and job_state_prov != blank %},{% endif %}
+                                                                {% endif %}
+                                                                {% if job_state_prov != blank %}
+                                                                    {{ job_state_prov }}
+                                                                {% endif %}
+
+                                                                {% if job.location.city == blank and job_state_prov == blank %}
+                                                                    {{ job.location.country }}
+                                                                {% endif %}
+                                                                &nbsp;
+                                                            </div>
+                                                            {% if cb_site_type == 'internal' %}
+                                                            <div class="columns xlarge-2"><span class="hide-for-xlarge">Job Number: </span>{{ job.cfm25 }}{% comment %}cfm25 is JobDisplayID{% endcomment %}
+                                                            </div>
+                                                            {% endif %}
+                                                            <div class="columns xlarge-2"><span class="hide-for-xlarge">Date Posted: </span><time datetime="{{ job.updated_at | date: '%Y-%m-%d' }}">{{ job.updated_at | date: '%b %-d, %Y' }}</time>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                {% endfor %}
+                                            </div><!--close .jobs-section__list-->
+                                            <div class="jobs-section__paginate non-facet">
+                                                <a href="{{ request_fullpath }}{% if request_fullpath contains '?' %}&{% else %}?{% endif %}page=2" class="jobs-section__paginate-view-more" rel="nofollow">View more jobs</a>
+                                                {{ jobs | paginate }}
+                                            </div>
+                                        {% endif %}
+
+                                        <section class="job-search-personalization non-facet hide-for-large">
+                                            {% if visitor.recent_jobs.total_entries > 0 and cb_site_type != 'internal' %}{% comment %}Customer wants to use a custom field for the Job Title, but custom fields are not supported for Personalization{% endcomment %}
+                                                <div class="padded-v-small space-small">
+                                                    <div class="visitor-item-wrapper space-medium">
+                                                        <h2 class="heading-4 space-small">Recently Viewed Jobs</h2>
+                                                        {% for job_data in visitor.recent_jobs limit: 5 %}
+                                                            <div class="visitor-item space-small"><a href="{{job_data.url}}" rel="nofollow">{{ job_data.title }}</a></div>
+                                                        {% endfor %}
+                                                    </div><!--close .visitor-item-wrapper-->
+                                                </div><!--close .branded-box-->
+                                            {% else %}
+                                                {% comment %}
+                                                <div class="space-small"><span class="branded-button-outer branded-button-1-outer branded-button-wide-outer">{{ "Personalize your experience" | link_to_social_login }}</span></div>
+                                                <!-- <span class="small-text"><a href="{{career_site.enable_tracking_url}}" rel="nofollow">Click here to enable personalized experience</a></span> -->
+                                                {% endcomment %}
+                                            {% endif %}
+                                        </section>
+                                    </div><!--close .jobs-section__inner-->
+                                </div><!--close .jobs-section-->
+                            </section>
+                        </div>
+                    </div><!--close .row-->
+                </div><!--close .column-->
+            </div><!--close .row-->
+
+        </div>
+    </div><!--close .page-details-wrapper-->
+ 
+{% endif %}{% comment %}END if params['ns_similar_jobs'] == 1{% endcomment %}
+ 
+{% page_required_footer %}

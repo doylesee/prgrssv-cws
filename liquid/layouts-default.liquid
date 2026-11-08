@@ -1,0 +1,977 @@
+{%- comment -%}
+██╗██╗██╗  ░██████╗████████╗░█████╗░██████╗░  ██╗██╗██╗
+██║██║██║  ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ██║██║██║
+██║██║██║  ╚█████╗░░░░██║░░░██║░░██║██████╔╝  ██║██║██║
+╚═╝╚═╝╚═╝  ░╚═══██╗░░░██║░░░██║░░██║██╔═══╝░  ╚═╝╚═╝╚═╝
+██╗██╗██╗  ██████╔╝░░░██║░░░╚█████╔╝██║░░░░░  ██╗██╗██╗
+╚═╝╚═╝╚═╝  ╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░  ╚═╝╚═╝╚═╝
+
+This code is intended for use and maintenance by authorized Talemetry CWS Developers only.
+If you are not part of the Talemetry CWS Development team, refrain from making any edits or modifications to the code.
+Unauthorized changes may result in functionality issues or unintended errors.
+
+For any updates, questions, or concerns, please contact your Account Manager for assistance.
+
+░█▀▀▀█ ▀█▀ ▀▀█▀▀ ░█▀▀▀ 　 ░█─░█ ░█▀▀▀█ ░█▀▀▀ ░█▀▀▀█ 　 ▀▀█▀▀ ░█─░█ ░█▀▀▀ ░█▀▄▀█ ░█▀▀▀ ░█▀▀▀█ 
+─▀▀▀▄▄ ░█─ ─░█── ░█▀▀▀ 　 ░█─░█ ─▀▀▀▄▄ ░█▀▀▀ ─▀▀▀▄▄ 　 ─░█── ░█▀▀█ ░█▀▀▀ ░█░█░█ ░█▀▀▀ ─▀▀▀▄▄ 
+░█▄▄▄█ ▄█▄ ─░█── ░█▄▄▄ 　 ─▀▄▄▀ ░█▄▄▄█ ░█▄▄▄ ░█▄▄▄█ 　 ─░█── ░█─░█ ░█▄▄▄ ░█──░█ ░█▄▄▄ ░█▄▄▄█
+
+This site utilizes the 'Progressive Theme' for styling and functionality.
+Please update the Theme directly rather than making changes to this site.
+Once updated, ensure the Theme is re-applied to all applicable sites to maintain consistency across the platform.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{%- endcomment -%}
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+        
+        <link rel="shortcut icon" type="image/x-icon" href="/system/production/assets/454754/original/progressive__icon--v2.png">
+        <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+        <!--iCims / Altru-->
+        <link rel="stylesheet" href="/system/production/assets/420263/original/video-widget.min.css{% asset_seed %}">
+
+        {% careersites_required_head_tags %}
+
+        {% include '/_config__variables' %}
+
+        <!--START SEO META-->
+        {% if cb_is_home_page == 'true' %}
+            {{ 'careers-home' | pages_with_tag | assign_to: 'careers_home' }}
+            <!--Setting meta content for Careers Home page-->
+            {% capture seo_to_index %}true{% endcapture %}
+            {% capture meta_title %}Search For Insurance Jobs and Apply | {{ cb_company_name }} Careers{% endcapture %}
+            {% capture meta_description %}{{ careers_home[0].meta_description }}{% endcapture %}
+            {% capture meta_keywords %}{{ careers_home[0].meta_keywords }}{% endcapture %}
+
+        {% elsif cb_is_category_page == 'true' %}
+            <!--Setting meta content for Category pages-->
+            {% capture seo_to_index %}true{% endcapture %}
+            {% capture meta_title %}{{ category_pages[0].title | html_safe }} | {{ cb_company_name }} Careers{% endcapture %}
+            {% capture meta_description %}{% if category_pages[0].meta_description != blank %}{{ category_pages[0].meta_description }}{% else %}{% meta_description_unescape %}{% endif %}{% endcapture %}
+            {% capture meta_keywords %}{% if category_pages[0].meta_keywords != blank %}{{ category_pages[0].meta_keywords }}{% else %}{% meta_keywords %}{% endif %}{% endcapture %}
+
+        {% elsif cb_is_job_search == 'true' %}
+            {% if selected_facets.size == 1 %}
+                {% capture seo_to_index %}true{% endcapture %}
+                {% capture meta_title %}{{ selected_facets[0]["label"] | html_escape }} Career{% if jobs.total_entries > 1 %}s{% endif %} | {{ cb_company_name }} Careers{% endcapture %}
+                {% capture meta_description %}{% if jobs.total_entries > 0 %}Search {{ jobs.total_entries }} {% endif %}{{ selected_facets[0]["label"] | html_escape }} Career{% if jobs.total_entries > 1 %}s{% endif %} available at {{ cb_company_name }}.{% endcapture %}
+                {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+            <!--Setting meta content for Saved Jobs page-->
+            {% elsif params['saved_jobs'] == '1' %}
+                {% capture seo_to_index %}false{% endcapture %}
+                {% capture meta_title %}Saved Jobs | {{ cb_company_name }} Careers{% endcapture %}
+                {% capture meta_description %}{% endcapture %}
+                {% capture meta_keywords %}{% endcapture %}
+            <!--Setting meta content for Job Search Results pages-->
+            {% else %}
+                {% if request_fullpath contains '?' and request_fullpath contains '=' %}
+                    {% capture seo_to_index %}false{% endcapture %}
+                {% elsif selected_facets.size > 1 %}
+                    {% capture seo_to_index %}false{% endcapture %}
+                {% else %}
+                    {% capture seo_to_index %}true{% endcapture %}
+                {% endif %}
+                {% capture meta_title %}Job Search Results | {{ cb_company_name }} Careers{% endcapture %}
+                {% capture meta_description %}{% if jobs.total_entries > 0 %}Search {{ jobs.total_entries }} {% endif %}Career{% if jobs.total_entries > 1 %}s{% endif %} available at {{ cb_company_name }}.{% endcapture %}
+                {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+            {% endif %}
+
+        {% elsif job %}
+            <!--Setting meta content for Job Details pages-->
+            {% capture job_location %}
+            {% if job.location.city != blank %}
+                {{ job.location.city }}{% if job.location.state_prov_short != blank or job.location.country != blank %},{% endif %}
+            {% endif %}
+            {% if job.location.state_prov_short != blank %}
+                {% capture job_location_state_prov_short_no_digit %}{{ job.location.state_prov_short | replace_global_regex: "[\d]", ":::" }}{% endcapture %}
+                {% if job_location_state_prov_short_no_digit contains ':::' %}
+                    {{ job.location.state_prov }}{% if job.location.country != blank %},{% endif %}
+                {% else %}
+                    {{ job.location.state_prov_short }}{% if job.location.country != blank %},{% endif %}
+                {% endif %}
+            {% endif %}
+            {% if job.location.country != blank %}{{ job.location.country }}{% endif %}
+            {% endcapture %}
+            {% capture seo_to_index %}{{ job.active? }}{% endcapture %}
+            {% capture meta_title %}{{ job.title }} in {{ job_location }} | {{ cb_company_name }} Careers{% endcapture %}
+            {% capture meta_description %}{{ job.title }} in {{ job_location }}{% endcapture %}
+            {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+
+        {% elsif page %}
+            <!--Setting meta content for content pages-->
+            {% if page.tag_list contains 'no-index' %}
+                {% capture seo_to_index %}false{% endcapture %}
+            {% else %}
+                {% capture seo_to_index %}true{% endcapture %}
+            {% endif %}
+            {% capture page_seo_title %}{% careersites_required_title %}{% endcapture %}
+            {% capture meta_title %}{% if page_seo_title != blank %}{{ page_seo_title }}{% else %}{{ page.title | html_safe }} | Progressive Careers{% endif %}{% endcapture %}
+            {% capture meta_description %}{% meta_description_unescape %}{% endcapture %}
+            {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+
+        {% elsif post %}
+            <!--Setting meta content for blog posts-->
+            {% capture seo_to_index %}true{% endcapture %}
+            {% capture page_seo_title %}{% careersites_required_title %}{% endcapture %}
+            {% capture meta_title %}{% if page_seo_title != blank %}{{ page_seo_title }}{% else %}{{ post.title | html_safe }} | Progressive Careers{% endif %}{% endcapture %}
+            {% capture meta_description %}{% meta_description_unescape %}{% endcapture %}
+            {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+
+        {% else %}
+            {% capture seo_to_index %}true{% endcapture %}
+            {% capture meta_title %}{% careersites_required_title %}{% endcapture %}
+            {% capture meta_description %}{% meta_description_unescape %}{% endcapture %}
+            {% capture meta_keywords %}{% meta_keywords %}{% endcapture %}
+
+        {% endif %}
+
+        {% if root_url contains 'internal' %}
+            <!--Setting meta content for non-indexable sites-->
+            {% capture seo_to_index %}false{% endcapture %}
+            {% capture meta_description %}{% endcapture %}
+            {% capture meta_keywords %}{% endcapture %}
+        {% endif %}
+
+        <title>{{ meta_title }}</title>
+
+        {% if seo_to_index == 'true' %}
+            {% if root_url contains 'preview' or root_url contains '-dev' %}
+                <meta name="robots" content="noindex, nofollow">
+            {% else %}
+                {% if job %}
+                    <meta name="robots" content="index, nofollow">
+                {% else %}
+                    <meta name="robots" content="index, follow">
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <meta name="robots" content="noindex, nofollow">
+        {% endif %}
+
+        {% capture current_url_with_current_locale_permalink %}{{ request_host_with_port }}{{ locale_permalink }}{% endcapture %}
+        {% capture current_url %}https://{{ request_host_with_port }}{{ request_path }}{% endcapture %}
+
+        {% if available_locales.total_entries > 0 %}
+            {% capture canonical_url %}{{ current_url | replace: current_url_with_current_locale_permalink,request_host_with_port }}{% endcapture %}
+        {% else %}
+            {% capture canonical_url %}{{ current_url }}{% endcapture %}
+        {% endif %}
+
+        {% comment %}Ensure that there's a trailing slash no matter what!{% endcomment %}
+        {% assign canonical_url_last_char = canonical_url | slice: -1 %}
+        {% if canonical_url_last_char != "/" %}
+            {% capture canonical_url %}{{ canonical_url }}/{% endcapture %}
+        {% endif %}
+        <link rel="canonical" href="{{ canonical_url }}" />
+
+        {% for locale in available_locales %}
+            {% capture current_url_with_locale_permalink %}{{ request_host_with_port }}/{{ locale.locale }}{% endcapture %}
+            {% capture locale_canonical_url %}{{ canonical_url | replace: request_host_with_port,current_url_with_locale_permalink }}{% endcapture %}
+            <link href="{{ locale_canonical_url }}" hreflang="{{ locale.locale }}" rel="alternate" type="text/html"/>
+        {% endfor %}
+
+        {% if meta_description != blank %}
+            <meta name="description" content="{{ meta_description }}">
+        {% endif %}
+        {% comment %}
+        {% if meta_keywords != blank %}
+            <meta name="keywords" content="{{ meta_keywords }}">
+        {% endif %}
+        Removed because meta keywords are outdated, irrelevant and has no impact on search engine rankings; and could even hurt SEO
+        {% endcomment %}
+        <!--END SEO META-->
+
+        <meta property="og:title" content="{{ meta_title }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/system/production/assets/454755/original/progressive__social-share--v2.jpg" />
+        <meta property="og:url" content="{{ root_url }}{{ request_fullpath | remove_first: '/' }}" />
+        {% if meta_description != blank %}<meta property="og:description" content="{{ meta_description }}" />{% endif %}
+        <meta property="og:locale" content="{% if current_locale.locale != blank %}{{ current_locale.locale }}{% else %}en{% endif %}" />
+        <meta property="og:image:alt" content="{{ cb_company_name }}">
+        <meta property="og:site_name" content="{{ career_site.name }}" />
+
+        {{ 'careers-home' | pages_with_tag | assign_to: 'careers_home' }}
+        {% if cb_is_home_page == 'true' %}
+            {% if careers_home[0].images.size == 1 %}{% capture web_image_url %}{{ careers_home[0].images[0].url }}{% endcapture %}{% endif %}
+            {% capture web_name %}{{ careers_home[0].title | html_safe }}{% endcapture %}
+
+        {% elsif cb_is_category_page == 'true' %}
+            {% if category_pages[0].images.size == 1 %}{% capture web_image_url %}{{ category_pages[0].images[0].url }}{% endcapture %}{% endif %}
+            {% capture web_name %}{{ category_pages[0].title | html_safe }}{% endcapture %}
+
+        {% elsif cb_is_job_search == 'true' %}
+            {% if selected_facets.size == 1 %}
+                {% capture web_name %}{{ selected_facets[0]["label"] | html_escape }} Careers{% endcapture %}
+            {% elsif params['saved_jobs'] == '1' %}
+                {% capture web_name %}Saved Jobs{% endcapture %}
+            {% else %}
+                {% capture web_name %}Job Search Results{% endcapture %}
+            {% endif %}
+
+        {% elsif job %}
+            {% capture web_name %}{{ job.title }}{% endcapture %}
+
+        {% elsif page %}
+            {% if page.images.size == 1 %}{% capture web_image_url %}{{ page.images[0].url }}{% endcapture %}{% endif %}
+            {% capture web_name %}{{ page.title | html_safe }}{% endcapture %}
+
+        {% elsif post %}
+            {% if post.images.size > 0 %}{% capture web_image_url %}{{ post.images[0].url }}{% endcapture %}{% endif %}
+            {% capture web_name %}{{ post.title | html_safe }}{% endcapture %}
+
+        {% endif %}
+
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "{{ web_name }}",
+            "description": "{{ meta_description }}",
+            "url": "{{ root_url }}{{ request_path| remove_first: '/' }}/"{% if web_image_url != blank %},
+            "image": "{{ web_image_url }}"{% endif %}
+        }
+        </script>
+
+        {% comment %}START Capturing Breadcrumb List + Schema{% endcomment %}
+        {% capture  breadcrumb_list %}{% endcapture %}
+        {% capture  breadcrumb_list_schema %}{% endcapture %}
+        {% if page and page.tag_list contains 'child-to-' %}
+            {{ page | assign_to: 'page_object' }}
+
+            {% for i in (1..employer.pages.size) %}
+                {% comment %}{{forloop.index}} : {{ page_object.title | html_safe }}<br />{% endcomment %}
+                {% if page_object.tag_list contains 'child-to-' %}
+                    {% for tag in page_object.tags %}
+                        {% if tag contains 'child-to' %}
+                            {% capture parent_page_permalink %}{{ tag | remove_first: 'child-to-' }}{% endcapture %}
+
+                            {{ 'has-child' | pages_with_tag | assign_to: 'parent_pages' }}
+                            {% for parent_page in parent_pages %}
+                                {% if parent_page.permalink == parent_page_permalink %}
+                                    {% capture parent_page_title %}{{ parent_page.title | html_safe }}{% endcapture %}
+                                    {% assign page_object = parent_page %}
+                                    {% break %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% capture parent_page_permalink_link %} &nbsp;&nbsp;&#8226;&nbsp;&nbsp; <a href="/pages/{{ parent_page_permalink }}/">{{ parent_page_title }}</a>{% endcapture %}
+                            {% capture  breadcrumb_list %}{{ breadcrumb_list | prepend: parent_page_permalink_link }}{% endcapture %}
+
+                            {% capture parent_page_schema %}
+                            |||,{
+                                "@type": "ListItem",
+                                "position": [FORLOOPINDEX],
+                                "name": "{{ parent_page_title }}",
+                                "item": "{{ root_url | replace: '.com/','.com' }}/pages/{{ parent_page_permalink }}"
+                            }
+                            {% endcapture %}
+                            {% capture  breadcrumb_list_schema %}{{ breadcrumb_list_schema | prepend: parent_page_schema }}{% endcapture %}
+
+                            {% break %}
+                        {% endif %}
+                    {% endfor %}
+
+                {% else %}
+                    {% assign page_object = '' %}
+                    {% break %}
+
+                {% endif %}
+
+                {% capture total_parent_pages %}{{ forloop.index }}{% endcapture %}
+            {% endfor %}
+        {% endif %}
+        {% comment %}END Capturing Breadcrumb List + Schema{% endcomment %}
+
+        {% comment %}Outputting Breadcrumb List Schema{% endcomment %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+
+        {% if cb_is_home_page == 'true' %}
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Careers"
+            }
+        {% else %}
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Careers",
+                "item": "{% if cb_site_type == 'internal' %}{{ cb_url_careers_internal }}{% else %}{{ cb_url_careers_external }}{% endif %}"
+            }
+        {% endif %}
+
+        {% unless cb_is_home_page == 'true' %}
+            {% capture breadcrumb_list_schema_sorted %}{% endcapture %}
+
+            {{ breadcrumb_list_schema | split: '|||' | assign_to: 'breadcrumb_list_schema_items' }}
+            {% for breadcrumb_list_schema_item in breadcrumb_list_schema_items %}
+                {% capture breadcrumb_list_schema_sorted %}
+                {{ breadcrumb_list_schema_sorted }}
+                {{ breadcrumb_list_schema_item | replace: '[FORLOOPINDEX]',forloop.index }}
+                {% endcapture %}
+            {% endfor %}
+
+            {{ breadcrumb_list_schema_sorted }}
+
+            {% if cb_is_job_search %}
+                ,{
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Job Openings"
+                }
+
+            {% elsif job %}
+                ,{
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Job Openings",
+                    "item": "{{ root_url | replace: '.com/','.com' }}/search/jobs"
+                }
+                ,{
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ job.title | html_safe }}"
+                }
+
+            {% elsif post %}
+                ,{
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Life at Progressive",
+                    "item": "{{ cb_url_careers_external }}/pages/{{ cb_life_permalink }}"
+                }
+                ,{
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ post.title | html_safe }}"
+                }
+
+            {% else %}
+                ,{
+                    "@type": "ListItem",
+                    "position": {% if page.tag_list contains 'child-to-' %}{{ total_parent_pages | plus: 2 }}{% else %}2{% endif %},
+                    "name": "{{ page.title | html_safe }}"
+                }
+                
+            {% endif %}
+        {% endunless %}
+            ]
+        }
+        </script>
+
+        {% comment %}Prod only code here{% endcomment %}
+        {% capture site_scripts_head %}/_site-{{ cb_site_type }}__scripts--head{% endcapture %}
+        {% include site_scripts_head %}
+    </head>
+    <body id="{{ template.permalink }}" class="scroll{% if request_fullpath contains '/search' %} has-search{% endif %}">
+        {% comment %}Prod only code here{% endcomment %}
+        {% capture site_scripts_body %}/_site-{{ cb_site_type }}__scripts--body{% endcapture %}
+        {% include site_scripts_body %}
+
+        {% comment %}
+        Pf 1/8: Progressive wants to remove the Talent Networks from all sites for now. They will add them back in a later Phase but not necessarily the same way.
+        <div class="hide">
+            {% capture returnurl %}return_url\":\"http:\\\\\\\\\\\\\\\\{{career_site.domain}}/\"{% endcapture %}
+            {% capture tn %}
+              {{ "Join our Talent Network" | link_to_talent_network: "talent-network-main-js", "talent-network-main-js" }}
+            {% endcapture %}
+            {{ tn | replace: 'return_url\":null', returnurl }}
+        </div>
+        {% endcomment %}
+
+        <div class="hide" id="general-referral-main-js">
+            {% if cb_is_dev == 'true' %}
+                {{ "General Referral" | link_to_launcher, launcher_key: "315ae3a1-5941-423a-b641-58865dea35f2" }}
+            {% else %}
+                {{ "General Referral" | link_to_launcher, launcher_key: "516cf9f1-2f67-4c88-aaec-9a0175427580" }}
+            {% endif %}
+        </div>
+
+        <div class="hide" id="employee-survey-main-js">
+            {% if cb_is_dev == 'true' %}
+                {{ "Employee Survey" | link_to_launcher, launcher_key: "bb47a18d-3887-49a6-b96b-26dfe17dea8a" }}
+            {% else %}
+                {{ "Employee Survey" | link_to_launcher, launcher_key: "e3b06331-5eaa-4bf8-8126-353816ae2766" }}
+            {% endif %}
+        </div>
+
+        <div class="preloader-wrapper preloader-wrapper--page">
+            <div class="preloader preloader--page">
+                <div class="page-loading hide-for-print" role="alert" aria-labelledby="page-loading">
+                    <div class="show-for-sr"><label id="page-loading">Page is loading</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="preloader-loaded">
+            <div class="page-loaded hide-for-print" role="alert" aria-labelledby="page-loaded">
+                <div class="show-for-sr"><label id="page-loaded">Page has loaded</label></div>
+            </div>
+        </div>
+
+        <div class="width-detector"></div>
+
+        <div class="saved-jobs-alert-wrapper full-height full-width hide-for-print" role="alert">
+            <div class="saved-jobs-alert background-white">
+                <div class="saved-jobs-alert__check background-1 color-white padded-medium">
+                    <i class="fa fa-circle-check" aria-hidden="true"></i>
+                </div>
+                <div class="saved-jobs-alert__message background-white color-1 padded-medium"></div>
+            </div><!--close .saved-jobs-alert-->
+        </div><!--close .saved-jobs-alert-wrapper-->
+
+        <div class="page-container fadeIn">
+
+            <div class="body-inner">
+                <div class="marker-1"></div>
+                <div class="marker-2"></div>
+                <div class="marker-3"></div>
+
+                <div class="relative-container" style="z-index: 99999;">
+                    <a class="skip-main hide-for-print" href="#main" rel="nofollow">Skip to Main Content</a>
+                </div>
+
+                {{ 'header-message' | pages_with_tag | assign_to: 'header_message' }}
+                {% if cb_is_home_page == 'true' and header_message.size > 0 %}
+                <div class="top-message-js hide relative-container text-center" data-module="info-bar">
+                    <div class="row">
+                        <div class="column {{ cb_classes_column_wide }}">
+                            {{ header_message[0].content }}
+                        </div>
+                    </div>
+                    <a hef="javascript:void(0);" class="top-message-close-js"><span class="show-for-sr">close</span></a>
+                </div>
+                {% endif %}
+                
+                <!--START Header-->
+                <div class="top-wrapper relative-container">
+                    <div class="header-anchor js"></div>
+                    <div class="header-outer" data-module="header">
+                        <header>
+                            <div class="row row--bigger">
+                                <div class="hide-for-print columns small-3 header__menu-mobile non-menu hide-for-large header__column">
+                                    {% if cb_site_type == 'loa' %}
+                                        &nbsp;
+                                    {% else %}
+                                        <div class="padded-medium">
+                                            <a href="javascript:void(0);" aria-expanded="false" class="header__menu-mobile-button" rel="nofollow" data-tracking-label="menu-open">Menu</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="columns small-6 large-2 xlarge-3 header__logo non-menu header__column">
+                                    <a data-tracking-label="logo" href="{% if cb_site_type == 'internal' %}{{ cb_url_careers_internal }}{% else %}https://www.progressive.com/{% endif %}" class="padded-medium"><img src="/system/production/assets/454753/original/progressive__logo.svg{% asset_seed %}" alt="{{ cb_company_name }}" loading="lazy" /></a>
+                                </div>
+
+                                <div class="hide-for-print columns large-8 xlarge-6 header__menu" aria-hidden="true">
+                                    {% if cb_site_type == 'loa' %}
+                                        &nbsp;
+                                    {% else %}
+                                        <nav class="header__menu-nav" tabindex="-1">
+                                            <div class="hide-for-large header__menu-copy">Menu</div>
+                                            <ul class="clearfix">
+                                                {% if cb_site_type == 'internal' %}
+                                                    <li class="not-a-parent"><a data-tracking-label="am-i-ready" href="/pages/am-i-ready">Am I Ready?</a></li>
+                                                    <li class="not-a-parent"><a data-tracking-label="preparing-for-your-interview" href="/pages/preparing-for-your-interview">Preparing for Your Interview</a></li>
+                                                    <li class="not-a-parent"><a data-tracking-label="faqs" href="/pages/faqs">FAQs </a></li>
+                                                    <li class="not-a-parent"><a data-tracking-label="erp" href="/pages/erp">ERP</a></li>
+                                                    <li class="not-a-parent"><a data-tracking-label="my-employee-referrals" href="{{ 'en' | candidate_portal_url }}" rel="nofollow">My Employee Referrals</a></li>
+
+                                                {% else %}
+                                                    <!-- <li class="not-a-parent"><a href="#">Sample link without children</a></li> -->
+                                                    <li class="parent-item-outer">
+                                                        <a class="parent-item" aria-expanded="false" href="javascript:void(0);">Our Teams</a>
+                                                        <div class="child-item" aria-hidden="true">
+                                                            <div class="hide-for-large back-to-parent-item"><a href="javascript:void(0);" class="child-item__back-link js header__menu-copy"><i class="fa-solid fa-chevron-left"></i> Back</a></div>
+                                                            <a data-tracking-label="our-teams" href="{{ cb_url_careers_external }}/pages/our-teams/">Our Teams</a>
+                                                            <ul>
+                                                                <li><a data-tracking-label="our-teams-claims" href="/pages/our-teams-claims/">Claims Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-customer-care" href="/pages/our-teams-customer-care/">Customer Care Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-data-analytics" href="/pages/our-teams-data-and-analytics/">Data Analytics Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-field-sales" href="/pages/our-teams-field-sales/">Field Sales Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-finance-and-acounting" href="/pages/our-teams-finance-and-accounting/">Finance &amp; Accounting Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-human-resources" href="/pages/our-teams-human-resources/">Human Resources Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-legal" href="/pages/our-teams-legal/">Legal Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-level20" href="/pages/our-teams-level20/">Level20 Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-marketing-and-communications" href="/pages/our-teams-marketing-and-communications/">Marketing &amp; Communications Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-product-and-account-management" href="/pages/our-teams-product-and-process-management/">Product &amp; Account Management Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-real-estate-and-facilities" href="/pages/our-teams-real-estate-and-facilities/">Real Estate &amp; Facilities Jobs</a></li>
+                                                                <li><a data-tracking-label="our-teams-technology" href="/pages/our-teams-technology/">Technology Jobs</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </li><!--close Our Teams-->
+                                                    <li class="parent-item-outer">
+                                                        <a class="parent-item" aria-expanded="false" href="javascript:void(0);">Difference</a>
+                                                        <div class="child-item" aria-hidden="true">
+                                                            <div class="hide-for-large back-to-parent-item"><a href="javascript:void(0);" class="child-item__back-link js header__menu-copy"><i class="fa-solid fa-chevron-left"></i> Back</a></div>
+                                                            <div class="hide-for-large"><i class="fa-solid fa-chevron-left"></i> BACK</div>
+                                                            <a data-tracking-label="our-teams" href="{{ cb_url_careers_external }}/pages/difference/">Difference</a>
+                                                            <ul>
+                                                                <li><a data-tracking-label="difference-our-culture" href="/pages/difference-our-culture/">Culture</a></li>
+                                                                <li><a data-tracking-label="difference-diversity-inclusion-programs" href="/pages/difference-diversity-inclusion-programs/">Diversity, Equity, &amp; Inclusion</a></li>
+                                                                <li><a data-tracking-label="difference-benefit" href="/pages/difference-benefits/">Benefits &amp; Compensation</a></li>
+                                                                <li><a data-tracking-label="difference-military-commitment" href="/pages/difference-military-commitment/">Commitment to the Military</a></li>
+                                                                <li><a data-tracking-label="difference-work-from-home" href="/pages/difference-work-from-home/">Work from Home</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </li><!--close Difference-->
+                                                    <li class="parent-item-outer">
+                                                        <a class="parent-item" aria-expanded="false" href="javascript:void(0);">Students &amp; Grads</a>
+                                                        <div class="child-item" aria-hidden="true">
+                                                            <div class="hide-for-large back-to-parent-item"><a href="javascript:void(0);" class="child-item__back-link js header__menu-copy"><i class="fa-solid fa-chevron-left"></i> Back</a></div>
+                                                            <div class="hide-for-large"><i class="fa-solid fa-chevron-left"></i> BACK</div>
+                                                            <a data-tracking-label="students-graduates" href="{{ cb_url_careers_external }}/pages/students-graduates/">Students &amp; Grads</a>
+                                                            <ul>
+                                                                <li><a data-tracking-label="students-graduates-internships" href="/pages/students-graduates-internships/">Internships for Current Students</a></li>
+                                                                <li><a data-tracking-label="students-graduates-entry-level" href="/pages/students-graduates-entry-level/">Jobs for Recent Graduates</a></li>
+                                                                <li><a data-tracking-label="students-graduates-mba-program" href="/pages/students-graduates-mba-program/">Jobs in our MBA Program</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </li><!--close Students and Grads-->
+                                                    <li class="parent-item-outer">
+                                                        <a class="parent-item" aria-expanded="false" href="javascript:void(0);">Hiring Process</a>
+                                                        <div class="child-item" aria-hidden="true">
+                                                            <div class="hide-for-large back-to-parent-item"><a href="javascript:void(0);" class="child-item__back-link js header__menu-copy"><i class="fa-solid fa-chevron-left"></i> Back</a></div>
+                                                            <div class="hide-for-large"><i class="fa-solid fa-chevron-left"></i> BACK</div>
+                                                            <a data-tracking-label="how-we-hire" href="{{ cb_url_careers_external }}/pages/how-we-hire/">Hiring Process</a>
+                                                            <ul>
+                                                                <li><a data-tracking-label="how-we-hire-application-next-steps" href="/pages/how-we-hire-application-next-steps/">Applying for a Job</a></li>
+                                                                <li><a data-tracking-label="how-we-hire-application-next-steps-employment-assessment" href="/pages/how-we-hire-application-next-steps-employment-assessment/">Employment Assessment</a></li>
+                                                                <li><a data-tracking-label="how-we-hire-application-next-steps-interviewing" href="/pages/how-we-hire-application-next-steps-interviewing/">Interviewing at Progressive</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </li><!--close Hiring Process-->
+                                                    <li class="parent-item-outer">
+                                                        <a class="parent-item" aria-expanded="false" href="javascript:void(0);">Life at Progressive</a>
+                                                        <div class="child-item" aria-hidden="true">
+                                                            <div class="hide-for-large back-to-parent-item"><a href="javascript:void(0);" class="child-item__back-link js header__menu-copy"><i class="fa-solid fa-chevron-left"></i> Back</a></div>
+                                                            <a data-tracking-label="life-at-progressive" href="{{ cb_url_careers_external }}/pages/{{ cb_life_permalink }}/">Life at Progressive</a>
+                                                            <ul>
+                                                                <li><a data-tracking-label="career-advice" href="/pages/career-advice/">Career Advice</a></li>
+                                                                <li><a data-tracking-label="employee-experiences" href="/pages/employee-experiences/">Employee Experiences</a></li>
+                                                                <li><a data-tracking-label="culture" href="/pages/culture/">Our Culture</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </li><!--close Life at Progressive-->
+
+                                                {% endif %}
+
+                                                {% comment %}
+                                                Pf 1/8: Progressive wants to remove the Talent Networks from all sites for now. They will add them back in a later Phase but not necessarily the same way.
+                                                <li class="not-a-parent hide-for-large"><a data-tracking-label="talent-network" href="{% if cb_site_type == 'internal' %}javascript:void(0);{% elsif cb_talent_network == 'tn_college' %}{{ cb_tn_url_college }}{% else %}{{ cb_tn_url_external }}{% endif %}"{% if cb_site_type == 'internal' %} class="talent-network-link"{% endif %}>Talent Network</a></li>
+                                                {% endcomment %}
+                                            </ul>
+                                        </nav>
+                                        <button class="header__menu-close js hide-for-large"><i class="fa-solid fa-xmark"></i><span class="show-for-sr">close navigation</span></button>
+                                    {% endif %}
+                                </div><!--close .header__menu-->
+
+                                <div class="columns small-3 large-2 xlarge-3 header__contact header__column text-right">
+                                    {% if cb_site_type == 'loa' %}
+                                        &nbsp;
+                                    {% else %}
+                                        <nav>
+                                            <ul class="clearfix">
+                                                {% if cb_site_type == 'internal' %}
+                                                    <li><a data-tracking-label="application-status" href="https://app.jvistg2.com/login/login.html" target="_blank"><span class="show-for-xlarge">Applicant </span>Status</a></li>
+                                                {% else %}
+                                                    <li><a data-tracking-label="careers-login" href="/careers-login/" target="_blank"><span class="show-for-xlarge">Careers </span>Login</a></li>
+                                                {% endif %}
+                                                {% comment %}
+                                                Pf 1/8: Progressive wants to remove the Talent Networks from all sites for now. They will add them back in a later Phase but not necessarily the same way.
+                                                <li class="show-for-large"><a data-tracking-label="talent-network" href="{% if cb_site_type == 'internal' %}javascript:void(0);{% elsif cb_talent_network == 'tn_college' %}{{ cb_tn_url_college }}{% else %}{{ cb_tn_url_external }}{% endif %}"{% if cb_site_type == 'internal' %} class="talent-network-link"{% endif %}>Talent Network</a></li>
+                                                {% endcomment %}
+                                            </ul>
+                                        </nav>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </header><!--close header-->
+                    </div><!--close .header-outer-->
+                </div><!--close .top-wrapper-->
+                <!--END Header-->
+
+                <div class="template-content non-menu{% if params['savejob'] == '1' %} hide{% endif %}">
+                    {% if job %}
+                        {% capture hide_search_form %}true{% endcapture %}
+                    {% elsif cb_site_type == 'internal' and cb_is_home_page == 'true' %}
+                        {% capture hide_search_form %}true{% endcapture %}
+                    {% endif %}
+                    {% if hide_search_form != 'true' %}
+                    <div class="hide-for-print background-3">
+                        <div class="padded-v-medium"></div>
+                        <div class="row">
+                            <div class="column {{ cb_classes_column_wide_ }}">
+                                <div class="branded-search background-white padded-v-medium padded-h-large space-large">
+                                    <div class="space-small"></div>
+                                    <div class="cs_item_type_jobsearch cs_cfix cs_jsearchform">
+                                        <form id="search_form---" method="get" action="/search/jobs/" class="search-form non-facet">
+                                            <div class="row">
+                                                <div class="columns large-8 xlarge-9">
+                                                    <div class="row">
+                                                        <div class="columns large-6--- space-small">
+                                                            <label for="cs_jobsearchforminput_keyword" class="show-for-sr">Keyword, job title, skills</label>
+                                                            <input type="text" placeholder="Keyword, job title, skills" id="cs_jobsearchforminput_keyword" class="ui-autocomplete-input" autocomplete="off" name="q" value="{{ params['q'] | escape_html }}">
+                                                            <!-- <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span> -->
+                                                        </div>
+                                                        {% comment %}
+                                                        <div class="columns large-6 space-small">
+                                                            <label for="search__location" class="show-for-sr">Enter a Location</label>
+                                                            <input type="text" name="location" value="{{ params['location'] | escape_html }}" placeholder="Enter a Location" id="search__location" />
+                                                        </div>
+                                                        {% endcomment %}
+                                                    </div>
+                                                </div>
+                                                <div class="columns large-4 xlarge-3">
+                                                    <div class="space-small">
+                                                        <input type="submit" value="View Job Openings" class="branded-button-1 full-width">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div><!--close .cs_item_type_jobsearch.cs_cfix cs_jsearchform-->
+                                </div><!--close .branded-search-->
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!--<div id="main" tabindex="-1" role="main"></div>-->
+
+                    <!--Banner section-->
+                    {% if cb_is_home_page == 'true' %}
+                        <!--see START SEO META for careers_home variable-->
+                        {{ careers_home[0] | assign_to: 'page_section_object' }}
+
+                    {% elsif page %}
+                        {{ page | assign_to: 'page_section_object' }}
+
+                    {% elsif post %}
+                        {{ post | assign_to: 'page_section_object' }}
+
+                    {% endif %}
+
+                    {% if cb_page_has_banner == 'true' %}
+                        {% if cb_is_home_page == 'true' %}
+                            {% if cb_site_type == 'internal' %}
+                                {% include '/banner__content-page' %}
+                            {% else %}
+                                {% include '/banner__careers-home' %}
+                            {% endif %}
+
+                        {% elsif page %}
+                            {% if page.tag_list contains cb_life_child_tag %}
+                                {% include '/banner__blog-category' %}
+                            {% else %}
+                                {% include '/banner__content-page' %}
+                            {% endif%}
+
+                        {% elsif post %}
+                            {% include '/banner__blog-post' %}
+
+                        {% endif %}
+
+                    {% elsif cb_page_has_hero_copy == 'true' %}
+                        {{ page_section_object.content | assign_to: 'page_section_object_content' }}
+                        {% include '/_config__logic-page-hero' %}
+
+                        <div class="row padded-v-medium page-section">
+                            <div class="column {{ cb_classes_column_narrow_template }}">
+                                {{ cb_page_hero }}
+                            </div>
+                        </div>
+
+                    {% else %}
+                        {% if page %}
+                            <div class="row padded-v-medium page-section">
+                                <div class="column {{ cb_classes_column_narrow_template }}">
+                                    <h1>{{ page.title | html_safe }}</h1>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    {% endif %}
+
+                    {% comment %}
+                    <div class="explore-view-openings-outer js">
+                        <div class="explore-view-openings">
+                            <div class="row">
+                                <div class="column">
+                                    <div class="explore-view-openings-inner">
+                                        <div class="row">
+                                            <div class="columns small-6">
+                                                <div class="explore-careers-outer">
+                                                    <a href="javascript:void(0);" class="explore-careers-js">
+                                                        <svg aria-hidden="true" focusable="false" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" tabindex="-1"><circle cx="7" cy="7" r="7" fill="none" tabindex="-1" focusable="false"></circle><circle cx="7" cy="7" r="6.5" fill="none" stroke="#0077b3" tabindex="-1" focusable="false"></circle><path d="M7,10,4,5h6Z" fill="#0077b3" tabindex="-1" focusable="false"></path></svg>
+                                                        &nbsp;
+                                                        EXPLORE CAREERS
+                                                    </a>
+                                                    <p><em>Teams, culture, applying, &amp; more</em></p>
+                                                </div>
+                                            </div>
+                                            <div class="columns small-6 text-right">
+                                                <a href="/search/jobs/" class="branded-button-3">View job openings</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="explore-view-openings-anchor js"></div>
+                    {% endcomment %}
+
+                    {% unless page.tag_list contains 'no-breadcrumbs' or post.tag_list contains 'no-breadcrumbs' or template.permalink == cb_life_page_permalink %}
+                        <div class="row">
+                            <div class="column {{ cb_classes_column_narrow_template }}">
+                                <div class="row">
+                                    <div class="columns{% if cb_is_category_content_page == 'true' %} large-8{% endif %}">
+                                        <div class="breadcrumb-list non-facet" data-module="breadcrumbs">
+                                            <div class="space-large"></div>
+                                            <a data-tracking-label="home" href="https://www.progressive.com/"><img src="/system/production/assets/421458/original/asset-p-mark_breadcrumb.svg" alt="Progressive Insurance Homepage" style="width: 11px;"></a>
+
+                                            &nbsp;&nbsp;&#8226;&nbsp;&nbsp;
+                                            {% if cb_is_home_page == 'true' %}
+                                                Careers
+                                            {% else %}
+                                                <a href="{% if cb_site_type == 'internal' %}{{ cb_url_careers_internal }}{% else %}{{ cb_url_careers_external }}{% endif %}/">Careers</a>
+                                            {% endif %}
+
+                                            {% unless cb_is_home_page == 'true' %}
+                                                {{ breadcrumb_list }}
+
+                                                &nbsp;&nbsp;&#8226;&nbsp;&nbsp;
+                                                {% if cb_is_job_search %}
+                                                    Job Openings
+
+                                                {% elsif job %}
+                                                    <a href="/search/jobs/">Job Openings</a>
+
+                                                    &nbsp;&nbsp;&#8226;&nbsp;&nbsp;
+                                                    {{ job.title | html_safe }}
+
+                                                {% elsif post %}
+                                                    <a href="/pages/{{ cb_life_permalink }}/">Life at Progressive</a>
+
+                                                    &nbsp;&nbsp;&#8226;&nbsp;&nbsp;
+                                                    {{ post.title | html_safe }}
+
+                                                {% else %}
+                                                    {{ page.title | html_safe }}
+                                                    
+                                                {% endif %}
+                                            {% endunless %}
+                                        </div>
+                                    </div>
+
+                                    {% if cb_is_category_content_page == 'true' %} 
+                                    <div class="columns large-4 large-text-right">
+                                        <div class="space-large"></div>
+                                        {% comment %}Ensure that there's a trailing slash no matter what!{% endcomment %}
+                                        {% assign cb_category_content_page_element_permalink_last_char = cb_category_content_page_element_permalink | slice: -1 %}
+                                        {% if cb_category_content_page_element_permalink_last_char != "/" %}
+                                            {% capture cb_category_content_page_element_permalink %}{{ cb_category_content_page_element_permalink }}/{% endcapture %}
+                                        {% endif %}
+                                        <a data-tracking-label="findacareer" href="{{ cb_category_content_page_element_permalink }}" class="branded-button-3">View Job Openings</a>
+                                    </div>
+                                    {% endif %}
+                                </div><!--close .row-->
+                            </div><!--close .column narrow-->
+                        </div>
+                    {% endunless %}
+
+                    {% if is_referral_site == 'true' %}
+                        {% if user.first_name != blank  or user.last_name != blank %}
+                            <div class="row">
+                                <div class="column">
+                                    <div class="space-small"></div>
+                                    Welcome, {{ user.first_name }} {{ user.last_name }}!
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {{ template_content }}
+
+                </div><!--close .template-content-->
+
+                <footer data-module="footer">
+                    {% comment %}
+                    Pf 1/8: Progressive wants to remove the Talent Networks from all sites for now. They will add them back in a later Phase but not necessarily the same way.
+                    {% if cb_is_home_page != 'true' and cb_site_type != 'internal' %}
+                        <section class="page-section">
+                            <div class="space-standard"></div>
+                            <div class="row">
+                                <div class="column {{ cb_classes_column_wide }}">
+                                    <div class="pro-tip-inner">
+                                        <h2 class="heading-4 branded-underline-2">JOIN OUR TALENT NETWORK</h2>
+                                        {% if cb_talent_network == 'tn_college' %}
+                                            <p>Stay up to date on career opportunities, employee stories, our culture, events, and more at Progressive.<br /><a href="{{ cb_tn_url_college }}" rel="nofollow">Join our College Talent Network</a></p>
+                                        {% else %}
+                                            <p>Want to join the team but don't see the right job for you? Don't worry&mdash;you can join our Talent Network and get updated as new jobs become available! <a href="{{ cb_tn_url_external }}" rel="nofollow">Add your name to the list</a> so you can be among the first to apply.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="padded-v-small"></div>
+                        </section>
+                    {% endif %}
+                    {% endcomment %}
+
+                    {% if cb_site_type == 'external' or cb_site_type == 'internal' %}
+                    <div class="row" data-module="jigsaw">
+                        <div class="column {{ cb_classes_column_narrow_template }}">
+                            <div class="space-standard"></div>
+                            <div class="footer__talent-network">
+                                <div class="footer__talent-network-image">
+                                    <img src="/system/production/assets/446632/original/footer__talent-network--v3.jpg" alt="" class="full-width space-medium" loading="lazy" />
+                                </div>
+                                <div class="footer__talent-network-copy">
+                                    {% if cb_is_category_content_page == 'true' %}
+                                        {% capture footer_view_job_openings_link %}{{ cb_category_content_page_element_permalink }}/{% endcapture %}
+
+                                    {% elsif template.permalink contains 'students-graduates' %}
+                                        {% capture footer_view_job_openings_link %}{{ cb_url_careers_college }}/search/jobs/{% endcapture %}
+
+                                    {% else %}
+                                        {% capture footer_view_job_openings_link %}/search/jobs/{% endcapture %}
+
+                                    {% endif %}
+
+                                    {% if cb_site_type == 'internal' %}
+                                        <p class="footer__talent-network-buttons">
+                                            <a data-tracking-label="findacareer" href="{{ footer_view_job_openings_link }}" class="branded-button-1 space-small" style="font-size: 18px;">View job openings</a>
+                                        </p>
+                                        <p>Take our Talent Assessment to share information that could help our hiring teams match you to future job opportunities.</p>
+                                        <p><a href="javascript:void(0);" class="employee-survey-link">Take PGR Talent Assessment</a></p>{% comment %}Need to use the Liquid code for TNs as the Launcher URL does not work for Internal sites{% endcomment %}
+
+                                    {% else %}
+                                        <h2 class="heading-3 space-medium footer__talent-network-buttons">Search careers and apply today</h2>
+                                        <p class="footer__talent-network-buttons">
+                                            <a data-tracking-label="findacareer" href="{{ footer_view_job_openings_link }}" class="branded-button-1 space-small" style="font-size: 18px;">View job openings</a>
+                                            <span class="show-for-medium">&nbsp;&nbsp;&nbsp;</span>
+                                            <strong><a href="/careers-login/" class="footer__talent-network-copy__careers-login">Careers login</a></strong>
+                                        </p>
+                                        {% comment %}
+                                        Pf 1/8: Progressive wants to remove the Talent Networks from all sites for now. They will add them back in a later Phase but not necessarily the same way.
+                                        <p><a href="{% if cb_talent_network == 'tn_college' %}{{ cb_tn_url_college }}{% else %}{{ cb_tn_url_external }}{% endif %}" class="talent-network-link footer__talent-network-copy__tn" rel="nofollow">Join our{% if cb_talent_network == 'tn_college' %} College{% endif %} Talent Network</a> and get updated as new jobs become available.</p>
+                                        {% endcomment %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% unless cb_site_type == 'internal' %}{% comment %}2024-12 KimW: Internal Site: Remove Social media icons{% endcomment %}
+                        <div class="padded-v-medium"></div>
+                        <div class="row">
+                            <div class="column footer__social-media text-center">
+                                <a href="https://twitter.com/pgrcareers" target="_blank" class="footer__social-media--x"><i class="fa-brands fa-x-twitter"><span class="show-for-sr">x</span></i></a>
+                                <a href="http://www.linkedin.com/company/progressive-insurance/" target="_blank" class="footer__social-media--linkedin"><i class="fa-brands fa-linkedin-in"><span class="show-for-sr">linkedin</span></i></a>
+                                <a href="http://www.youtube.com/progressivecareers" target="_blank" class="footer__social-media--youtube"><i class="fa-brands fa-youtube"><span class="show-for-sr">youtube</span></i></a>
+                                <a href="http://www.glassdoor.com/Overview/Working-at-Progressive-Insurance-EI_IE546.11,32.htm" target="_blank" class="footer__social-media--glassdoor">
+                                    <svg aria-hidden="true" focusable="false" preserveAspectRatio="xMinYMid meet" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1536 1536" style="enable-background:new 0 0 1536 1536;" xml:space="preserve"><style type="text/css">   .st0{fill:#76A926;}</style><path class="st0" d="M768,13.8C351.5,13.8,13.8,351.5,13.8,768c0,416.6,337.7,754.2,754.2,754.2c416.6,0,754.2-337.6,754.2-754.2    C1522.2,351.5,1184.6,13.8,768,13.8L768,13.8z M1039,1039.6c-20.4,25.6-54.9,31.5-86.9,45.9c-36.4,16.3-75.8,32-112.2,48.2  c-19.6,8.8-38.3,13-57.9,21.7c-51.9,23.3-106.9,47.2-160.4,67.5c-24.2,9.2-57.4-0.8-70-12c-10.6-9.5-19-27.6-22.9-43.5  c0-53,0-106.1,0-159.1c0-156,0-312,0-468c0-31,0-61.9,0-92.9c0-19.9-1.3-39.6,4.8-54.3c7.7-18.5,20.7-35,36.2-45.9  c28.3-19.9,108.9-2.1,139.9,7.2c3.6,0,7.2,0,10.8,0c3.7,1,12,3.8,15.7,4.8c3.6,0,7.2,0,10.9,0c33,10,73.7,10.2,106.1,21.7   c9.1,3.2,16.2-0.4,25.4,2.4c24.5,7.4,55.1,9.6,79.6,16.9c9.1,2.7,15.1,0,24.2,2.4c20.8,5.7,54.2,13.8,77.2,14.5 c0,19.3,0,38.6,0,57.9c-18.3,0-41.4-3.1-57.9-7.2c-5.6,0-11.2,0-16.9,0c-14-3.5-34.2-3.7-48.2-7.2c-5.7,0-11.3,0-16.9,0 c-34.8-8.6-77.4-5.8-112.2-14.5c-6,0-12,0-18,0c-27.5-7.2-67.1-9.6-84.5,7.2c-7.5,7.3-16.3,21.6-19.3,32.6c0,46.6,0,93.3,0,139.9    c0,153.2,0,306.4,0,459.5c0.8,0,1.6,0,2.4,0c5-5.2,13.1-4,20.5-7.2c8.4-3.7,19.4-8.5,27.7-12.1c6.8-3,12.6-1.9,19.3-4.8 c43-18.9,91.9-31.9,135.1-50.6c16.8-7.3,38.8-8.2,51.8-19.3c35.9-30.7,25.3-78.8,25.3-142.3c0-115.8,0-231.6,0-347.4    c32.3-0.2,61.8,3.9,91.7,4.8c0,123.8,0,247.7,0,371.5C1059.5,938.1,1065.7,1006.1,1039,1039.6L1039,1039.6z" focusable="false"></path></svg>
+                                    <span class="show-for-sr">glassdoor</span>
+                                </a>
+                                <a href="https://www.instagram.com/progressive/" target="_blank" class="footer__social-media--instagram"><i class="fa-brands fa-instagram"><span class="show-for-sr">instagram</span></i></a>
+                            </div>
+                        </div>
+                    {% endunless %}
+
+                    <div class="space-standard"></div>
+                    <div class="row">
+                        <div class="column {{ cb_classes_column_wide }}">
+                            <div class="footer__copyright padded-v-medium">
+                                <div class="padded-v-small">
+                                    <ul>
+                                        {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}
+                                            <li><a href="https://progressiveinsurance.sharepoint.com/sites/highway/Pages/personnel-privacy.aspx">Personnel Privacy Policy</a></li>
+                                            <li><a href="https://progressiveinsurance.sharepoint.com/sites/highway/Pages/personnel-privacy.aspx#california-notice-at-collection">CA Notice at Collection</a></li>
+
+                                        {% else %}
+                                            <li><a href="https://www.progressive.com/contact-us/">Contact Us</a></li>
+                                            <li><a href="/pages/site-map/">Site Map</a></li>
+                                            <li><a href="https://www.progressive.com/careers/privacy-jobs/">Privacy &amp; Security</a></li>
+                                            <li><a href="https://www.progressive.com/careers/copyright-jobs/">Terms of Use</a></li>
+                                            <li><a href="https://www.progressive.com/careers/privacy-jobs/#notice-at-collection">CA Notice at Collection</a></li>
+                                            <li><a href="https://www.progressive.com/privacy/do-not-sell-my-information/">Do Not Sell or Share My Personal Information (CA Residents Only)</a></li>
+                                            <li><a href="https://www.progressive.com">Progressive.com</a></li>
+
+                                        {% endif %}
+                                    </ul>
+
+                                    {% if cb_site_type == 'internal' or cb_site_type == 'loa' %}
+                                        <p class="small-text body">Confidential &amp; Proprietary. Progressive Casualty Insurance Company.</p>
+                                    {% else %}
+                                        <p class="small-text body">
+                                            <strong>THE #1 INSURANCE WEBSITE</strong><br />
+                                            Copyright 1995 - {{ 'now' | date: "%Y" }}. Progressive Casualty Insurance Company. All Rights Reserved.<br />
+                                            <br />
+                                            *&copy;2024 FORTUNE Media IP Limited. All rights reserved. Used under license.
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="padded-v-large"></div>
+                </footer><!--close footer-->
+
+            </div><!--close .body-inner-->
+
+        </div><!--close .page-container-->
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.6.3/dist/js/foundation.min.js" integrity="sha256-pRF3zifJRA9jXGv++b06qwtSqX1byFQOLjqa2PTEb2o=" crossorigin="anonymous"></script>
+        <script>$(document).foundation();</script>
+
+        {% comment %}Prod only code here{% endcomment %}
+        {% capture site_scripts_footer %}/_site-{{ cb_site_type }}__scripts--footer{% endcapture %}
+        {% include site_scripts_footer %}
+
+        {% careersites_required_footer %}
+    </body>
+</html>
